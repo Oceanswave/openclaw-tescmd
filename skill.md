@@ -1,6 +1,6 @@
 ---
 name: openclaw-tescmd
-version: 0.1.0
+version: 0.3.1
 description: Agent handbook for Tesla vehicle control and telemetry via the tescmd node — covers 37 tools, 34 commands, 8 slash commands, and 14 telemetry event types.
 homepage: https://github.com/oceanswave/openclaw-tescmd
 metadata: {"category":"platform","platform":"tesla","node":"tescmd"}
@@ -14,7 +14,7 @@ This plugin gives agents full control of a Tesla vehicle through the OpenClaw Ga
 - Plugin (this repo): https://github.com/oceanswave/openclaw-tescmd
 - tescmd node (Python CLI): https://github.com/oceanswave/tescmd
 
-This document is a self-contained reference. You should not need to call `tescmd_help` for routine tasks — everything is here.
+This document is an installation and configuration reference. Once installed, the plugin will automatically register tools, commands, and events.
 
 ---
 
@@ -129,15 +129,12 @@ Wait for the user to confirm before continuing.
 
 ---
 
-### Step 2: Install the OpenClaw Plugin
-
-The plugin is installed from a local git clone, not from a registry.
+### Step 2: Install the tescmd OpenClaw Plugin
 
 #### Standard install:
 
 ```bash
-git clone https://github.com/oceanswave/openclaw-tescmd.git
-openclaw plugins install ./openclaw-tescmd
+openclaw plugins install @oceanswave/openclaw-tescmd
 ```
 
 #### Development install (symlink, editable):

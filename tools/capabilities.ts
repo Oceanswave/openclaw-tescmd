@@ -41,6 +41,15 @@ You have access to a Tesla vehicle through the tescmd node. Here's what you can 
 | tescmd_flash_lights / tescmd_honk_horn | User wants to locate the car or signal |
 | tescmd_sentry_on / tescmd_sentry_off | User wants camera monitoring on/off. Note: uses ~1-2% battery/hour |
 
+### Navigation (send destinations to the vehicle)
+| Tool | Use When... |
+|------|------------|
+| tescmd_nav_send | User says 'navigate to [place]' or 'send directions to the car'. Pass a full address or place name |
+| tescmd_nav_gps | User provides lat/lon coordinates, or you have coordinates from a location lookup |
+| tescmd_nav_supercharger | User says 'find a Supercharger' or battery is low. Pair with tescmd_get_battery first |
+| tescmd_nav_waypoints | User wants a multi-stop road trip using Google Place IDs as waypoints |
+| tescmd_homelink | User says 'open the garage'. Get location first with tescmd_get_location, then pass lat/lon |
+
 ### Triggers (subscribe to telemetry conditions)
 | Tool | Use When... |
 |------|------------|
@@ -84,6 +93,15 @@ You have access to a Tesla vehicle through the tescmd node. Here's what you can 
 2. tescmd_sentry_on → enable camera monitoring
 3. tescmd_location_trigger → geofence alert if car moves
 4. Confirm setup
+
+### "Navigate somewhere"
+1. tescmd_nav_send → pass the address or place name
+2. Or: tescmd_nav_gps → if you have exact lat/lon coordinates
+3. For multi-stop: tescmd_nav_waypoints → comma-separated Place IDs
+
+### "Open the garage"
+1. tescmd_get_location → get the vehicle's current GPS
+2. tescmd_homelink → pass lat/lon to trigger HomeLink
 
 ### "Find my car"
 1. tescmd_get_location → get GPS coordinates

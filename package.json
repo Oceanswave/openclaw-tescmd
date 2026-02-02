@@ -1,6 +1,6 @@
 {
 	"name": "@oceanswave/openclaw-tescmd",
-	"version": "0.3.4",
+	"version": "0.3.5",
 	"description": "OpenClaw platform plugin for Tesla vehicle control and telemetry via tescmd",
 	"type": "module",
 	"license": "MIT",

@@ -16,11 +16,10 @@ This plugin registers the Tesla vehicle platform with the OpenClaw Gateway, enab
 
 ## Installation
 
-Clone the repository and install locally:
+Install from npm:
 
 ```bash
-git clone https://github.com/oceanswave/openclaw-tescmd.git
-openclaw plugins install ./openclaw-tescmd
+openclaw plugins install @oceanswave/openclaw-tescmd
 ```
 
 For development (symlink, editable):

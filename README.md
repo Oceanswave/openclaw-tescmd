@@ -7,8 +7,8 @@ OpenClaw platform plugin for Tesla vehicle control and real-time telemetry via [
 This plugin registers the Tesla vehicle platform with the OpenClaw Gateway, enabling AI agents to control Tesla vehicles and consume telemetry through well-documented tools. It bridges the [tescmd](https://github.com/oceanswave/tescmd) node — a Python CLI for the Tesla Fleet API — to the OpenClaw agent ecosystem.
 
 **Plugin provides:**
-- **32 agent-callable tools** across vehicle status, charging, climate, security, trunk, triggers, and system commands
-- **29 whitelisted commands** so the Gateway can dispatch to tescmd nodes
+- **37 agent-callable tools** across vehicle status, charging, climate, security, trunk, navigation, triggers, and system commands
+- **34 whitelisted commands** so the Gateway can dispatch to tescmd nodes
 - **8 slash commands** for quick user actions (`/battery`, `/lock`, `/climate`, etc.)
 - **14 telemetry event types** documented with TypeScript interfaces
 - **Capabilities meta-tool** with workflow recipes, error handling guide, and CLI reference
@@ -76,6 +76,15 @@ tescmd serve <VIN> --openclaw <gateway_ws_url> --openclaw-token <token>
 | `tescmd_open_trunk` / `tescmd_open_frunk` | Trunk/frunk |
 | `tescmd_flash_lights` / `tescmd_honk_horn` | Locator alerts |
 | `tescmd_sentry_on` / `tescmd_sentry_off` | Sentry Mode |
+
+### Navigation
+| Tool | Description |
+|------|-------------|
+| `tescmd_nav_send` | Send address/place to vehicle navigation |
+| `tescmd_nav_gps` | Send GPS coordinates to navigation |
+| `tescmd_nav_supercharger` | Route to nearest Supercharger |
+| `tescmd_nav_waypoints` | Multi-stop route via waypoint IDs |
+| `tescmd_homelink` | Trigger garage door (HomeLink) |
 
 ### Triggers
 | Tool | Description |

@@ -91,7 +91,7 @@ const READ_COMMANDS: PlatformCommand[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Write commands (20)
+// Write commands (26)
 // ---------------------------------------------------------------------------
 
 const WRITE_COMMANDS: PlatformCommand[] = [
@@ -268,6 +268,46 @@ const WRITE_COMMANDS: PlatformCommand[] = [
 		direction: "write",
 	},
 
+	// -- Navigation --
+	{
+		method: "nav.send",
+		label: "Send Destination",
+		description:
+			"Send a street address or place name to the vehicle's navigation. " +
+			"Destination appears on the touchscreen ready to route. Alias: Fleet API 'share'.",
+		direction: "write",
+	},
+	{
+		method: "nav.gps",
+		label: "Navigate to GPS",
+		description:
+			"Send GPS coordinates (lat/lon) to the vehicle's navigation. " +
+			"Optional 'order' parameter for multi-stop routing.",
+		direction: "write",
+	},
+	{
+		method: "nav.supercharger",
+		label: "Navigate to Supercharger",
+		description: "Route the vehicle to the nearest Tesla Supercharger station.",
+		direction: "write",
+	},
+	{
+		method: "nav.waypoints",
+		label: "Send Waypoints",
+		description:
+			"Send a multi-stop route using comma-separated waypoint reference IDs " +
+			"(Google Place IDs in refId format).",
+		direction: "write",
+	},
+	{
+		method: "homelink.trigger",
+		label: "Trigger HomeLink",
+		description:
+			"Trigger the vehicle's HomeLink to open/close a garage door. " +
+			"Requires lat/lon to verify the vehicle is near the programmed device.",
+		direction: "write",
+	},
+
 	// -- Meta-dispatch --
 	{
 		method: "system.run",
@@ -294,7 +334,7 @@ export const ALL_COMMANDS: PlatformCommand[] = [...READ_COMMANDS, ...WRITE_COMMA
 /**
  * Register the Tesla platform with the OpenClaw Gateway.
  *
- * This whitelists all 28 commands so the Gateway will dispatch
+ * This whitelists all 34 commands so the Gateway will dispatch
  * `node.invoke.request` events to connected tescmd nodes.
  */
 export function registerPlatform(api: OpenClawPluginApi): void {
@@ -303,8 +343,8 @@ export function registerPlatform(api: OpenClawPluginApi): void {
 		label: "Tesla Vehicle",
 		description:
 			"Tesla vehicle control and real-time telemetry via tescmd. " +
-			"Supports 28 commands across vehicle status, charging, climate, " +
-			"security, trunk, sentry mode, and trigger subscriptions. " +
+			"Supports 34 commands across vehicle status, charging, climate, " +
+			"security, trunk, sentry mode, navigation, and trigger subscriptions. " +
 			"The tescmd node connects to the Tesla Fleet API and streams " +
 			"telemetry data including GPS location, battery, temperature, " +
 			"speed, charge state, and security events.",

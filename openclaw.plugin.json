@@ -1,0 +1,22 @@
+{
+	"id": "openclaw-tescmd",
+	"kind": "platform",
+	"configSchema": {
+		"type": "object",
+		"properties": {
+			"debug": {
+				"type": "boolean",
+				"default": false,
+				"description": "Enable verbose debug logging"
+			}
+		},
+		"required": []
+	},
+	"uiHints": {
+		"debug": {
+			"label": "Debug Mode",
+			"help": "Enable verbose logging for troubleshooting node communication",
+			"advanced": true
+		}
+	}
+}

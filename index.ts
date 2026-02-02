@@ -37,7 +37,6 @@ import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
 import { registerCliCommands } from "./commands/cli.js";
 import { registerSlashCommands } from "./commands/slash.js";
 import { type TescmdConfig, tescmdConfigSchema } from "./config.js";
-import { registerPlatform } from "./platform.js";
 import { registerCapabilitiesTool } from "./tools/capabilities.js";
 import { registerChargeTools } from "./tools/charge.js";
 import { registerClimateTools } from "./tools/climate.js";
@@ -67,9 +66,6 @@ export default {
 		if (config.debug) {
 			api.logger.info("openclaw-tescmd: debug mode enabled");
 		}
-
-		// Register the Tesla platform + command whitelist
-		registerPlatform(api);
 
 		// Register all agent-callable tools by domain
 		registerCapabilitiesTool(api);

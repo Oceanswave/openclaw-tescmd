@@ -119,14 +119,6 @@ Wait for the user to confirm before continuing.
 openclaw plugins install @oceanswave/openclaw-tescmd
 ```
 
-#### Development install (symlink, editable):
-
-```bash
-git clone https://github.com/oceanswave/openclaw-tescmd.git
-cd openclaw-tescmd && bun install && cd ..
-openclaw plugins install -l ./openclaw-tescmd
-```
-
 #### Verify installation:
 
 ```bash

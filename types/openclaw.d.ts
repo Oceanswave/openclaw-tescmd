@@ -36,17 +36,7 @@ declare module "openclaw/plugin-sdk" {
 		name: string;
 	}
 
-	/** Platform definition for node registration. */
-	interface PlatformDefinition {
-		id: string;
-		label: string;
-		description: string;
-		nodeRole: string;
-		scopes: string[];
-		commands: PlatformCommand[];
-	}
-
-	/** A whitelisted command for a platform. */
+	/** A command descriptor for a platform (used in plugin metadata and documentation). */
 	interface PlatformCommand {
 		method: string;
 		label: string;
@@ -89,18 +79,37 @@ declare module "openclaw/plugin-sdk" {
 
 	/** The main plugin API surface. */
 	interface OpenClawPluginApi {
+		id: string;
+		name: string;
+		version: string;
+		description: string;
+		source: string;
+		config: Record<string, unknown>;
 		pluginConfig: unknown;
+		runtime: unknown;
 		logger: PluginLogger;
 		registerTool(tool: ToolDefinition, options: ToolOptions): void;
+		registerHook(
+			events: string | string[],
+			handler: (...args: unknown[]) => unknown,
+			opts?: { name?: string; description?: string; register?: boolean },
+		): void;
+		registerHttpHandler(handler: (req: unknown, res: unknown) => void): void;
+		registerHttpRoute(params: {
+			path: string;
+			handler: (req: unknown, res: unknown) => void;
+		}): void;
+		registerChannel(registration: unknown): void;
+		registerProvider(provider: { id: string; [key: string]: unknown }): void;
 		registerCommand(command: CommandDefinition): void;
 		registerCli(
 			handler: (ctx: { program: unknown }) => void,
 			options?: { commands: string[] },
 		): void;
 		registerService(service: ServiceDefinition): void;
-		registerPlatform(platform: PlatformDefinition): void;
 		registerGatewayMethod(method: string, handler: (ctx: GatewayMethodContext) => void): void;
-		on(event: string, handler: (...args: unknown[]) => unknown): void;
+		resolvePath(input: string): string;
+		on(event: string, handler: (...args: unknown[]) => unknown, opts?: { priority?: number }): void;
 	}
 
 	/** Helper to create TypeBox-compatible string enums. */

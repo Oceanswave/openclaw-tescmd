@@ -10,7 +10,7 @@
  * `CommandDispatcher` handler map (src/tescmd/openclaw/dispatcher.py).
  */
 
-import type { OpenClawPluginApi, PlatformCommand } from "openclaw/plugin-sdk";
+import type { PlatformCommand } from "openclaw/plugin-sdk";
 
 // ---------------------------------------------------------------------------
 // Read commands (8)
@@ -328,34 +328,8 @@ const WRITE_COMMANDS: PlatformCommand[] = [
 export const ALL_COMMANDS: PlatformCommand[] = [...READ_COMMANDS, ...WRITE_COMMANDS];
 
 // ---------------------------------------------------------------------------
-// Registration
+// Command metadata helpers
 // ---------------------------------------------------------------------------
 
-/**
- * Register the Tesla platform with the OpenClaw Gateway.
- *
- * This whitelists all 34 commands so the Gateway will dispatch
- * `node.invoke.request` events to connected tescmd nodes.
- */
-export function registerPlatform(api: OpenClawPluginApi): void {
-	api.registerPlatform({
-		id: "tesla",
-		label: "Tesla Vehicle",
-		description:
-			"Tesla vehicle control and real-time telemetry via tescmd. " +
-			"Supports 34 commands across vehicle status, charging, climate, " +
-			"security, trunk, sentry mode, navigation, and trigger subscriptions. " +
-			"The tescmd node connects to the Tesla Fleet API and streams " +
-			"telemetry data including GPS location, battery, temperature, " +
-			"speed, charge state, and security events.",
-		nodeRole: "node",
-		scopes: ["node.telemetry", "node.command"],
-		commands: ALL_COMMANDS,
-	});
-
-	api.logger.info(
-		`Registered tesla platform with ${ALL_COMMANDS.length} whitelisted commands ` +
-			`(${READ_COMMANDS.length} reads, ${WRITE_COMMANDS.length} writes, ` +
-			`including system.run meta-dispatch)`,
-	);
-}
+/** All command method names, useful for documentation and config generation. */
+export const ALL_COMMAND_METHODS: string[] = ALL_COMMANDS.map((cmd) => cmd.method);

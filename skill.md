@@ -1,5 +1,7 @@
 ---
 name: openclaw-tescmd
+slug: openclaw-tescmd
+displayName: OpenClaw Tesla (tescmd)
 version: 0.3.1
 description: Installation and setup guide for Tesla vehicle control and telemetry via the tescmd node.
 homepage: https://github.com/oceanswave/openclaw-tescmd

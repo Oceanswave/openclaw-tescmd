@@ -17,7 +17,8 @@
 		"tools/",
 		"commands/",
 		"types/",
-		"openclaw.plugin.json"
+		"openclaw.plugin.json",
+		"skill.md"
 	],
 	"openclaw": {
 		"extensions": [

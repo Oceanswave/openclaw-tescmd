@@ -95,7 +95,7 @@ Verify it loaded:
 openclaw tescmd status
 ```
 
-You should see the plugin status with 29 whitelisted commands and 14 telemetry event types.
+You should see the plugin status with 34 whitelisted commands and 14 telemetry event types.
 
 ---
 
@@ -214,7 +214,7 @@ openclaw tescmd status
 Or use the agent tool:
 - Call `tescmd_node_status` to check connection status
 
-If connected, you now have access to all 32 Tesla vehicle tools. Call `tescmd_help` for a full reference of available tools, workflows, and troubleshooting.
+If connected, you now have access to all 37 Tesla vehicle tools. Call `tescmd_help` for a full reference of available tools, workflows, and troubleshooting.
 
 ---
 
@@ -242,6 +242,15 @@ If connected, you now have access to all 32 Tesla vehicle tools. Call `tescmd_he
 | `tescmd_open_trunk` / `tescmd_open_frunk` | Trunk access |
 | `tescmd_flash_lights` / `tescmd_honk_horn` | Locate vehicle |
 | `tescmd_sentry_on` / `tescmd_sentry_off` | Sentry Mode |
+
+### Navigation (send destinations):
+| Tool | Purpose |
+|------|---------|
+| `tescmd_nav_send` | Send address/place to navigation |
+| `tescmd_nav_gps` | Send GPS coordinates to navigation |
+| `tescmd_nav_supercharger` | Route to nearest Supercharger |
+| `tescmd_nav_waypoints` | Multi-stop route via waypoints |
+| `tescmd_homelink` | Trigger garage door (HomeLink) |
 
 ### Triggers (telemetry subscriptions):
 | Tool | Purpose |

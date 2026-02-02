@@ -44,3 +44,5 @@ jobs:
           token: ""
 
       - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ""

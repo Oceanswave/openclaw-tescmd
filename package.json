@@ -29,8 +29,7 @@
 		"openclaw": ">=2026.1.29"
 	},
 	"dependencies": {
-		"@sinclair/typebox": "^0.34.47",
-		"ws": "^8.19.0"
+		"@sinclair/typebox": "^0.34.47"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.8",

@@ -1,24 +1,31 @@
 # openclaw-tescmd
 
-**Give your AI assistant the keys to your Tesla.**
+**Your Tesla, orchestrated.**
 
-Control your Tesla with natural language. Check battery, start climate, unlock doors, navigate anywhere — all through conversation with your OpenClaw agent.
+This plugin makes your Tesla a first-class citizen in your agent's toolchain. Combine it with calendars, places, weather, messages — and let your agent handle the rest.
 
 [![npm version](https://img.shields.io/npm/v/@oceanswave/openclaw-tescmd.svg)](https://www.npmjs.com/package/@oceanswave/openclaw-tescmd)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## Why openclaw-tescmd?
+## The Power of Composition
 
-Your Tesla app requires you to open it, wait for it to connect, navigate menus, and tap buttons. With openclaw-tescmd, just *ask*:
+The real value isn't controlling your Tesla. It's what happens when your agent *combines* tools:
 
-> "Is my car locked?"  
-> "Start warming up the car"  
-> "How much range do I have?"  
-> "Send directions to the nearest Supercharger"
+> **"Send that coffee shop I like to my Cybertruck"**  
+> Agent: looks up your favorite spot → gets the address → sends it to vehicle navigation
 
-The plugin bridges your Tesla to OpenClaw's AI agent, turning natural conversation into vehicle commands.
+> **"I'm leaving for the airport in 20 minutes"**  
+> Agent: checks calendar for flight time → pulls up terminal → pre-conditions cabin → sends airport address to nav
+
+> **"Road trip to Asheville — find Superchargers along the way"**  
+> Agent: gets coordinates → `tescmd_superchargers_route` → sends multi-stop nav → sets charge limit to 90%
+
+> **"Is there a Supercharger near the restaurant?"**  
+> Agent: gets restaurant coords → `tescmd_superchargers_near` → returns closest options with stall count and power
+
+Your Tesla becomes one node in a larger workflow. The agent handles the orchestration.
 
 ---
 
@@ -30,111 +37,108 @@ The plugin bridges your Tesla to OpenClaw's AI agent, turning natural conversati
 openclaw plugins install @oceanswave/openclaw-tescmd
 ```
 
-### 2. Set Up the Tesla Node
+### 2. Connect Your Tesla
 
-The [tescmd](https://github.com/oceanswave/tescmd) node connects your Tesla to the Gateway:
+The [tescmd](https://github.com/oceanswave/tescmd) node bridges your vehicle to the Gateway:
 
 ```bash
-# Install
 pip install tescmd
-
-# First-time setup (guided wizard)
-tescmd setup
-
-# Connect to OpenClaw
-tescmd serve <VIN> --openclaw <gateway_ws_url> --openclaw-token <token>
+tescmd setup                    # One-time auth
+tescmd serve <VIN> --openclaw <gateway_url> --openclaw-token <token>
 ```
 
-### 3. Start Talking to Your Car
+### 3. Compose Away
 
-That's it. Your agent now has 37 tools, 14 slash commands, and real-time telemetry access.
-
----
-
-## What You Can Do
-
-### Ask Questions
-- "What's my battery level?"
-- "Is the car locked?"
-- "How hot is it inside?"
-- "Where's my car?"
-
-### Control Your Vehicle
-- "Lock the doors"
-- "Turn on the AC and set it to 72°"
-- "Start charging to 80%"
-- "Open the trunk"
-- "Flash the lights" (find it in the parking lot)
-
-### Navigate
-- "Send directions to 1600 Amphitheatre Parkway"
-- "Navigate to the nearest Supercharger"
-- "Open the garage door"
-
-### Set Up Alerts
-- "Let me know when battery drops below 20%"
-- "Alert me if the cabin gets above 90°F"
-- "Notify me when the car leaves home"
+Your agent now has 40 Tesla tools that work alongside everything else — calendars, places, weather, messages, web search, and more.
 
 ---
 
-## Slash Commands
+## Example Workflows
 
-Quick actions from any chat:
+These aren't scripted — they're natural language requests your agent can fulfill by chaining tools:
 
-| Command | What It Does |
-|---------|--------------|
-| `/battery` | Battery level and range |
-| `/charge` | Charge status, or `start` / `stop` / `80` (set limit) |
-| `/climate` | Temps, or `on` / `off` / `72` (set temp) |
-| `/lock` | Lock all doors |
-| `/unlock` | Unlock all doors |
-| `/sentry` | Sentry status, or `on` / `off` |
-| `/location` | GPS with map link |
-| `/vehicle` | Full status dashboard |
-| `/nav <address>` | Send destination to car |
-| `/flash` | Flash headlights |
-| `/honk` | Honk horn |
-| `/trunk` | Open/close rear trunk |
-| `/frunk` | Open front trunk |
-| `/homelink` | Trigger garage door |
+| Request | Tools Involved |
+|---------|---------------|
+| "Navigate to my 2pm meeting" | Calendar → Places → `tescmd_nav_send` |
+| "Road trip to Asheville, find Superchargers" | Places → `tescmd_superchargers_route` → `tescmd_nav_waypoints` |
+| "Is there a Supercharger near the restaurant?" | `tescmd_superchargers_near` (with restaurant coords) |
+| "Let me know when I'm charged enough to get home" | `tescmd_get_location` → distance calc → `tescmd_battery_trigger` |
+| "Prep the car, I'm heading out" | `tescmd_climate_on` → `tescmd_unlock_doors` |
+| "Find Superchargers in Richmond" | `tescmd_superchargers_search` |
+| "Open the garage when I get home" | `tescmd_location_trigger` → `tescmd_homelink` |
 
 ---
 
-## Agent Tools
+## What the Plugin Provides
 
-The plugin registers 37 tools that your AI agent can call:
+### 40 Agent Tools
 
-### Vehicle Status
-`tescmd_get_battery` · `tescmd_get_location` · `tescmd_get_speed` · `tescmd_get_temperature` · `tescmd_get_charge_state` · `tescmd_get_security` · `tescmd_node_status`
+**Status:** `tescmd_get_battery` · `tescmd_get_location` · `tescmd_get_speed` · `tescmd_get_temperature` · `tescmd_get_charge_state` · `tescmd_get_security`
 
-### Vehicle Control
-`tescmd_lock_doors` · `tescmd_unlock_doors` · `tescmd_climate_on` · `tescmd_climate_off` · `tescmd_set_climate_temp` · `tescmd_start_charge` · `tescmd_stop_charge` · `tescmd_set_charge_limit` · `tescmd_open_trunk` · `tescmd_open_frunk` · `tescmd_flash_lights` · `tescmd_honk_horn` · `tescmd_sentry_on` · `tescmd_sentry_off`
+**Control:** `tescmd_lock_doors` · `tescmd_unlock_doors` · `tescmd_climate_on` · `tescmd_climate_off` · `tescmd_set_climate_temp` · `tescmd_start_charge` · `tescmd_stop_charge` · `tescmd_set_charge_limit` · `tescmd_open_trunk` · `tescmd_open_frunk` · `tescmd_flash_lights` · `tescmd_honk_horn` · `tescmd_sentry_on` · `tescmd_sentry_off`
 
-### Navigation
-`tescmd_nav_send` · `tescmd_nav_gps` · `tescmd_nav_supercharger` · `tescmd_nav_waypoints` · `tescmd_homelink`
+**Navigation:** `tescmd_nav_send` · `tescmd_nav_gps` · `tescmd_nav_supercharger` · `tescmd_nav_waypoints` · `tescmd_homelink`
 
-### Triggers & Alerts
-`tescmd_create_trigger` · `tescmd_delete_trigger` · `tescmd_list_triggers` · `tescmd_poll_triggers` · `tescmd_battery_trigger` · `tescmd_cabin_temp_trigger` · `tescmd_outside_temp_trigger` · `tescmd_location_trigger`
+**Superchargers:** `tescmd_superchargers_near` · `tescmd_superchargers_route` · `tescmd_superchargers_search`
 
-### Meta
-`tescmd_help` · `tescmd_run_command`
+**Triggers:** `tescmd_create_trigger` · `tescmd_battery_trigger` · `tescmd_cabin_temp_trigger` · `tescmd_outside_temp_trigger` · `tescmd_location_trigger` · `tescmd_list_triggers` · `tescmd_poll_triggers` · `tescmd_delete_trigger`
+
+**Meta:** `tescmd_node_status` · `tescmd_help` · `tescmd_run_command`
+
+### Supercharger Discovery
+
+Built-in integration with [supercharge.info](https://supercharge.info) — a community-maintained database of Tesla Superchargers worldwide:
+
+| Tool | Use Case |
+|------|----------|
+| `tescmd_superchargers_near` | Find Superchargers near any coordinates |
+| `tescmd_superchargers_route` | Find Superchargers along a route between two points |
+| `tescmd_superchargers_search` | Search by city, state, or name |
+
+Returns stall count, power level (kW), status, and distance — everything you need to plan charging stops.
+
+### 14 Slash Commands
+
+Quick actions when you don't need the full agent:
+
+| Command | Action |
+|---------|--------|
+| `/battery` | Battery + range |
+| `/charge [start\|stop\|80]` | Charging control |
+| `/climate [on\|off\|72]` | HVAC control |
+| `/lock` `/unlock` | Door locks |
+| `/sentry [on\|off]` | Sentry Mode |
+| `/location` | GPS + map link |
+| `/vehicle` | Full status |
+| `/nav <address>` | Send destination |
+| `/flash` `/honk` | Find your car |
+| `/trunk` `/frunk` | Trunk control |
+| `/homelink` | Garage door |
+
+### Real-Time Telemetry
+
+The tescmd node streams live data — battery, location, temperature, charge state, security changes — so your agent always has current information without polling.
 
 ---
 
-## Real-Time Telemetry
+## Triggers: Event-Driven Automation
 
-The tescmd node streams live data to your Gateway:
+Triggers let you set up conditions that fire automatically:
 
-| Event | Data |
-|-------|------|
-| `location` | GPS coordinates, heading, speed |
-| `battery` | Level (%), range (miles) |
-| `inside_temp` / `outside_temp` | Temperature (°F) |
-| `charge_state_changed` | Charging, Complete, Stopped, etc. |
-| `security_changed` | Lock state, sentry mode |
-| `gear_changed` | Park, Drive, Reverse, Neutral |
-| `trigger.fired` | Your custom alert triggered |
+```
+"Alert me if battery drops below 20%"
+→ tescmd_battery_trigger(operator='lt', value=20)
+
+"Notify me when the car leaves home"  
+→ tescmd_location_trigger(operator='leave', lat=..., lon=..., radius=500)
+
+"Tell me if cabin gets above 100°F"
+→ tescmd_cabin_temp_trigger(operator='gt', value=100)
+```
+
+Combine with other tools for powerful automation:
+- Trigger fires → Agent checks weather → Sends you a contextual message
+- Geofence exit → Agent locks doors → Enables sentry → Confirms via message
 
 ---
 
@@ -142,26 +146,22 @@ The tescmd node streams live data to your Gateway:
 
 | Requirement | Purpose |
 |-------------|---------|
-| Python 3.11+ | Runs the tescmd node |
+| Python 3.11+ | tescmd node |
 | Tesla account | Fleet API access |
-| Git + GitHub CLI | Key hosting setup (one-time) |
-| Tailscale (recommended) | HTTPS for telemetry streaming |
+| Git + GitHub CLI | Key hosting (one-time setup) |
 
 ---
 
 ## Configuration
 
-Minimal config — the tescmd node handles vehicle-specific settings:
+Minimal — the tescmd node handles vehicle config:
 
 ```json
 {
   "plugins": {
     "entries": {
       "openclaw-tescmd": {
-        "enabled": true,
-        "config": {
-          "debug": false
-        }
+        "enabled": true
       }
     }
   }
@@ -170,12 +170,12 @@ Minimal config — the tescmd node handles vehicle-specific settings:
 
 ---
 
-## CLI Commands
+## CLI Reference
 
 ```bash
-openclaw tescmd status     # Plugin and node connection status
-openclaw tescmd commands   # List all whitelisted commands
-openclaw tescmd events     # List telemetry event types
+openclaw tescmd status     # Connection status
+openclaw tescmd commands   # Available commands
+openclaw tescmd events     # Telemetry event types
 ```
 
 ---
@@ -184,23 +184,18 @@ openclaw tescmd events     # List telemetry event types
 
 ```bash
 git clone https://github.com/oceanswave/openclaw-tescmd.git
-cd openclaw-tescmd
-bun install
-bun run check-types
-bun run lint
-```
-
-For local development with OpenClaw:
-```bash
+cd openclaw-tescmd && bun install
+bun run check-types && bun run lint
 openclaw plugins install -l ./openclaw-tescmd
 ```
 
 ---
 
-## Related Projects
+## Related
 
-- **[tescmd](https://github.com/oceanswave/tescmd)** — The Python CLI that bridges Tesla Fleet API to OpenClaw
-- **[OpenClaw](https://github.com/openclaw/openclaw)** — The AI agent Gateway this plugin extends
+- **[tescmd](https://github.com/oceanswave/tescmd)** — Python CLI bridging Tesla Fleet API to OpenClaw
+- **[OpenClaw](https://github.com/openclaw/openclaw)** — The agent Gateway this plugin extends
+- **[supercharge.info](https://supercharge.info)** — Community Supercharger database (powers the discovery tools)
 
 ---
 
@@ -210,4 +205,4 @@ MIT
 
 ---
 
-*Built for Tesla owners who want their AI assistant to actually be useful.*
+*Your Tesla is now part of the workflow.*

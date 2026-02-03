@@ -6,9 +6,9 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/oceanswave/openclaw-tescmd.git"
+		"url": "git+https://github.com/Oceanswave/openclaw-tescmd.git"
 	},
-	"homepage": "https://github.com/oceanswave/openclaw-tescmd",
+	"homepage": "https://github.com/Oceanswave/openclaw-tescmd",
 	"files": [
 		"index.ts",
 		"config.ts",

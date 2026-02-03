@@ -1,6 +1,6 @@
 import * as fs from "node:fs";
-import * as path from "node:path";
 import * as os from "node:os";
+import * as path from "node:path";
 
 // Utils for tescmd plugin - uses /tools/invoke HTTP endpoint
 
@@ -25,7 +25,7 @@ let cachedToken: string | null = null;
 
 function getToken(): string {
 	if (cachedToken !== null) return cachedToken;
-	
+
 	// Try env var first
 	let token = process.env.OPENCLAW_GATEWAY_TOKEN || "";
 	if (!token) {
@@ -42,12 +42,16 @@ function getToken(): string {
 }
 
 // Use fetch to call the gateway's /tools/invoke HTTP endpoint
-async function callTool<T>(toolName: string, action: string, args: Record<string, unknown>): Promise<T> {
+async function callTool<T>(
+	toolName: string,
+	action: string,
+	args: Record<string, unknown>,
+): Promise<T> {
 	const port = process.env.OPENCLAW_GATEWAY_PORT || "18789";
 	const token = getToken();
-	
+
 	const body = { tool: toolName, action, args };
-	
+
 	const response = await fetch(`http://127.0.0.1:${port}/tools/invoke`, {
 		method: "POST",
 		headers: {
@@ -56,23 +60,23 @@ async function callTool<T>(toolName: string, action: string, args: Record<string
 		},
 		body: JSON.stringify(body),
 	});
-	
+
 	if (!response.ok) {
 		const text = await response.text();
 		throw new Error(`Tool invoke failed: ${response.status} - ${text}`);
 	}
-	
-	const result = await response.json() as ToolsInvokeResponse;
-	
+
+	const result = (await response.json()) as ToolsInvokeResponse;
+
 	if (!result.ok) {
 		throw new Error(result.error?.message || "Tool invoke failed");
 	}
-	
+
 	// Parse the result - prefer details, fallback to parsing content text
 	if (result.result?.details) {
 		return result.result.details as T;
 	}
-	
+
 	if (result.result?.content?.[0]?.text) {
 		try {
 			return JSON.parse(result.result.content[0].text) as T;
@@ -80,7 +84,7 @@ async function callTool<T>(toolName: string, action: string, args: Record<string
 			return result.result.content[0].text as unknown as T;
 		}
 	}
-	
+
 	return result.result as unknown as T;
 }
 
@@ -111,10 +115,8 @@ export async function invokeTescmdNode<T = unknown>(
 
 	try {
 		// Use nodes action=run which invokes system.run on the node
-		const command = Object.keys(params).length > 0
-			? [method, JSON.stringify(params)]
-			: [method];
-		
+		const command = Object.keys(params).length > 0 ? [method, JSON.stringify(params)] : [method];
+
 		return await callTool<T>("nodes", "run", {
 			node: nodeId,
 			command,
@@ -128,9 +130,8 @@ export async function invokeTescmdNode<T = unknown>(
 			cachedNodeId = null;
 			const newNodeId = await getTescmdNodeId(true);
 			if (newNodeId) {
-				const command = Object.keys(params).length > 0
-					? [method, JSON.stringify(params)]
-					: [method];
+				const command =
+					Object.keys(params).length > 0 ? [method, JSON.stringify(params)] : [method];
 				return await callTool<T>("nodes", "run", {
 					node: newNodeId,
 					command,

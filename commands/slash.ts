@@ -18,11 +18,11 @@
  */
 
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
-import { invokeTescmdNode, getTescmdNodeId } from "../tools/utils.js";
+import { getTescmdNodeId, invokeTescmdNode } from "../tools/utils.js";
 
 // Helper to format temperature from Celsius to Fahrenheit
 function cToF(c: number): number {
-	return Math.round(c * 9 / 5 + 32);
+	return Math.round((c * 9) / 5 + 32);
 }
 
 export function registerSlashCommands(api: OpenClawPluginApi): void {
@@ -37,12 +37,16 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 				if (!nodeId) {
 					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
 				}
-				const result = await invokeTescmdNode<{ battery_level: number; range_miles: number }>("battery.get");
+				const result = await invokeTescmdNode<{ battery_level: number; range_miles: number }>(
+					"battery.get",
+				);
 				return {
 					text: `🔋 **Battery:** ${result.battery_level}%\n🛣️ **Range:** ${Math.round(result.range_miles)} miles`,
 				};
 			} catch (err) {
-				return { text: `❌ Failed to get battery: ${err instanceof Error ? err.message : String(err)}` };
+				return {
+					text: `❌ Failed to get battery: ${err instanceof Error ? err.message : String(err)}`,
+				};
 			}
 		},
 	});
@@ -60,7 +64,7 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 				}
 
 				const arg = ctx.args?.trim().toLowerCase();
-				
+
 				if (arg === "start") {
 					await invokeTescmdNode("charge.start");
 					return { text: "⚡ Charging started!" };
@@ -87,7 +91,9 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 					text: `⚡ **Charge State:** ${chargeState.charge_state}\n🔋 **Battery:** ${battery.battery_level}%\n🛣️ **Range:** ${Math.round(battery.range_miles)} mi\n\n_Usage: /charge start | stop | <limit%>_`,
 				};
 			} catch (err) {
-				return { text: `❌ Charge command failed: ${err instanceof Error ? err.message : String(err)}` };
+				return {
+					text: `❌ Charge command failed: ${err instanceof Error ? err.message : String(err)}`,
+				};
 			}
 		},
 	});
@@ -105,7 +111,7 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 				}
 
 				const arg = ctx.args?.trim().toLowerCase();
-				
+
 				if (arg === "on") {
 					await invokeTescmdNode("climate.on");
 					return { text: "❄️ Climate control turned ON" };
@@ -125,12 +131,16 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 				}
 
 				// Default: show temperature
-				const result = await invokeTescmdNode<{ inside_temp_c: number; outside_temp_c: number }>("temperature.get");
+				const result = await invokeTescmdNode<{ inside_temp_c: number; outside_temp_c: number }>(
+					"temperature.get",
+				);
 				return {
 					text: `🚗 **Inside:** ${cToF(result.inside_temp_c)}°F (${result.inside_temp_c.toFixed(1)}°C)\n🌡️ **Outside:** ${cToF(result.outside_temp_c)}°F (${result.outside_temp_c}°C)\n\n_Usage: /climate on | off | <temp°F>_`,
 				};
 			} catch (err) {
-				return { text: `❌ Climate command failed: ${err instanceof Error ? err.message : String(err)}` };
+				return {
+					text: `❌ Climate command failed: ${err instanceof Error ? err.message : String(err)}`,
+				};
 			}
 		},
 	});
@@ -186,7 +196,7 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 				}
 
 				const arg = ctx.args?.trim().toLowerCase();
-				
+
 				if (arg === "on") {
 					await invokeTescmdNode("sentry.on");
 					return { text: "👁️ Sentry Mode enabled" };
@@ -197,14 +207,18 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 				}
 
 				// Default: show status
-				const result = await invokeTescmdNode<{ locked: boolean; sentry_mode: boolean }>("security.get");
+				const result = await invokeTescmdNode<{ locked: boolean; sentry_mode: boolean }>(
+					"security.get",
+				);
 				const lockStatus = result.locked ? "🔒 Locked" : "🔓 Unlocked";
 				const sentryStatus = result.sentry_mode ? "👁️ ON" : "😴 OFF";
 				return {
 					text: `**Doors:** ${lockStatus}\n**Sentry:** ${sentryStatus}\n\n_Usage: /sentry on | off_`,
 				};
 			} catch (err) {
-				return { text: `❌ Sentry command failed: ${err instanceof Error ? err.message : String(err)}` };
+				return {
+					text: `❌ Sentry command failed: ${err instanceof Error ? err.message : String(err)}`,
+				};
 			}
 		},
 	});
@@ -220,14 +234,21 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 				if (!nodeId) {
 					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
 				}
-				const result = await invokeTescmdNode<{ latitude: number; longitude: number; heading: number; speed: number }>("location.get");
+				const result = await invokeTescmdNode<{
+					latitude: number;
+					longitude: number;
+					heading: number;
+					speed: number;
+				}>("location.get");
 				const mapsUrl = `https://maps.google.com/?q=${result.latitude},${result.longitude}`;
 				const speedMph = result.speed ? `${Math.round(result.speed)} mph` : "parked";
 				return {
 					text: `📍 **Location:** ${result.latitude.toFixed(5)}, ${result.longitude.toFixed(5)}\n🧭 **Heading:** ${Math.round(result.heading)}°\n🚗 **Speed:** ${speedMph}\n\n[Open in Maps](${mapsUrl})`,
 				};
 			} catch (err) {
-				return { text: `❌ Failed to get location: ${err instanceof Error ? err.message : String(err)}` };
+				return {
+					text: `❌ Failed to get location: ${err instanceof Error ? err.message : String(err)}`,
+				};
 			}
 		},
 	});
@@ -269,7 +290,9 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 					].join("\n"),
 				};
 			} catch (err) {
-				return { text: `❌ Failed to get vehicle status: ${err instanceof Error ? err.message : String(err)}` };
+				return {
+					text: `❌ Failed to get vehicle status: ${err instanceof Error ? err.message : String(err)}`,
+				};
 			}
 		},
 	});
@@ -288,13 +311,17 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 
 				const address = ctx.args?.trim();
 				if (!address) {
-					return { text: "❌ Usage: `/nav <address or place name>`\n\nExample: `/nav 1600 Amphitheatre Parkway, Mountain View, CA`" };
+					return {
+						text: "❌ Usage: `/nav <address or place name>`\n\nExample: `/nav 1600 Amphitheatre Parkway, Mountain View, CA`",
+					};
 				}
 
 				await invokeTescmdNode("nav.send", { address });
 				return { text: `🧭 Sent to navigation: **${address}**` };
 			} catch (err) {
-				return { text: `❌ Failed to send destination: ${err instanceof Error ? err.message : String(err)}` };
+				return {
+					text: `❌ Failed to send destination: ${err instanceof Error ? err.message : String(err)}`,
+				};
 			}
 		},
 	});
@@ -313,7 +340,9 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 				await invokeTescmdNode("flash_lights");
 				return { text: "💡 Headlights flashed!" };
 			} catch (err) {
-				return { text: `❌ Failed to flash lights: ${err instanceof Error ? err.message : String(err)}` };
+				return {
+					text: `❌ Failed to flash lights: ${err instanceof Error ? err.message : String(err)}`,
+				};
 			}
 		},
 	});
@@ -351,7 +380,9 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 				await invokeTescmdNode("trunk.open");
 				return { text: "🚗 Trunk actuated!" };
 			} catch (err) {
-				return { text: `❌ Failed to actuate trunk: ${err instanceof Error ? err.message : String(err)}` };
+				return {
+					text: `❌ Failed to actuate trunk: ${err instanceof Error ? err.message : String(err)}`,
+				};
 			}
 		},
 	});
@@ -370,7 +401,9 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 				await invokeTescmdNode("frunk.open");
 				return { text: "🚗 Frunk opened! (Must be closed manually)" };
 			} catch (err) {
-				return { text: `❌ Failed to open frunk: ${err instanceof Error ? err.message : String(err)}` };
+				return {
+					text: `❌ Failed to open frunk: ${err instanceof Error ? err.message : String(err)}`,
+				};
 			}
 		},
 	});
@@ -388,11 +421,18 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 				}
 
 				// Get current location first
-				const location = await invokeTescmdNode<{ latitude: number; longitude: number }>("location.get");
-				await invokeTescmdNode("homelink.trigger", { lat: location.latitude, lon: location.longitude });
+				const location = await invokeTescmdNode<{ latitude: number; longitude: number }>(
+					"location.get",
+				);
+				await invokeTescmdNode("homelink.trigger", {
+					lat: location.latitude,
+					lon: location.longitude,
+				});
 				return { text: "🏠 HomeLink triggered!" };
 			} catch (err) {
-				return { text: `❌ Failed to trigger HomeLink: ${err instanceof Error ? err.message : String(err)}` };
+				return {
+					text: `❌ Failed to trigger HomeLink: ${err instanceof Error ? err.message : String(err)}`,
+				};
 			}
 		},
 	});

@@ -203,6 +203,10 @@ openclaw plugins install -l ./openclaw-tescmd
 
 MIT
 
+## Acknowledgments
+
+- **[supercharge.info](https://supercharge.info)** — Supercharger discovery tools are powered by their community-maintained database of 10,000+ Tesla Superchargers worldwide. Consider [supporting them on Patreon](https://www.patreon.com/supercharge_info).
+
 ---
 
 *Your Tesla is now part of the workflow.*

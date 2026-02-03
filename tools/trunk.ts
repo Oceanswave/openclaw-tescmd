@@ -8,6 +8,7 @@
 
 import { Type } from "@sinclair/typebox";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
+import { invokeTescmdNode } from "./utils.js";
 
 export function registerTrunkTools(api: OpenClawPluginApi): void {
 	// -----------------------------------------------------------------
@@ -24,14 +25,14 @@ export function registerTrunkTools(api: OpenClawPluginApi): void {
 				"physically closed. Auto-wakes the vehicle if asleep.",
 			parameters: Type.Object({}),
 			async execute(_toolCallId: string, _params: Record<string, unknown>) {
+				const result = await invokeTescmdNode("trunk.open", {});
 				return {
 					content: [
 						{
 							type: "text" as const,
-							text: "Invoking trunk.open on tescmd node",
+							text: JSON.stringify(result, null, 2),
 						},
 					],
-					details: { nodeMethod: "trunk.open", params: {} },
 				};
 			},
 		},
@@ -51,14 +52,14 @@ export function registerTrunkTools(api: OpenClawPluginApi): void {
 				"physically pushed down to close. Auto-wakes the vehicle if asleep.",
 			parameters: Type.Object({}),
 			async execute(_toolCallId: string, _params: Record<string, unknown>) {
+				const result = await invokeTescmdNode("frunk.open", {});
 				return {
 					content: [
 						{
 							type: "text" as const,
-							text: "Invoking frunk.open on tescmd node",
+							text: JSON.stringify(result, null, 2),
 						},
 					],
-					details: { nodeMethod: "frunk.open", params: {} },
 				};
 			},
 		},

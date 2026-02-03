@@ -7,6 +7,7 @@
 
 import { Type } from "@sinclair/typebox";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
+import { invokeTescmdNode } from "./utils.js";
 
 export function registerSecurityTools(api: OpenClawPluginApi): void {
 	// -----------------------------------------------------------------
@@ -24,14 +25,14 @@ export function registerSecurityTools(api: OpenClawPluginApi): void {
 				"\n\nData source: Locked/SentryMode telemetry → Fleet API vehicle_state.",
 			parameters: Type.Object({}),
 			async execute(_toolCallId: string, _params: Record<string, unknown>) {
+				const result = await invokeTescmdNode("security.get", {});
 				return {
 					content: [
 						{
 							type: "text" as const,
-							text: "Invoking security.get on tescmd node",
+							text: JSON.stringify(result, null, 2),
 						},
 					],
-					details: { nodeMethod: "security.get", params: {} },
 				};
 			},
 		},
@@ -51,14 +52,14 @@ export function registerSecurityTools(api: OpenClawPluginApi): void {
 				"Auto-wakes the vehicle if asleep. Returns {result: true, reason: 'ok'}.",
 			parameters: Type.Object({}),
 			async execute(_toolCallId: string, _params: Record<string, unknown>) {
+				const result = await invokeTescmdNode("door.lock", {});
 				return {
 					content: [
 						{
 							type: "text" as const,
-							text: "Invoking door.lock on tescmd node",
+							text: JSON.stringify(result, null, 2),
 						},
 					],
-					details: { nodeMethod: "door.lock", params: {} },
 				};
 			},
 		},
@@ -81,14 +82,14 @@ export function registerSecurityTools(api: OpenClawPluginApi): void {
 				"without explicit user confirmation.",
 			parameters: Type.Object({}),
 			async execute(_toolCallId: string, _params: Record<string, unknown>) {
+				const result = await invokeTescmdNode("door.unlock", {});
 				return {
 					content: [
 						{
 							type: "text" as const,
-							text: "Invoking door.unlock on tescmd node",
+							text: JSON.stringify(result, null, 2),
 						},
 					],
-					details: { nodeMethod: "door.unlock", params: {} },
 				};
 			},
 		},
@@ -108,14 +109,14 @@ export function registerSecurityTools(api: OpenClawPluginApi): void {
 				"Auto-wakes the vehicle if asleep.",
 			parameters: Type.Object({}),
 			async execute(_toolCallId: string, _params: Record<string, unknown>) {
+				const result = await invokeTescmdNode("flash_lights", {});
 				return {
 					content: [
 						{
 							type: "text" as const,
-							text: "Invoking flash_lights on tescmd node",
+							text: JSON.stringify(result, null, 2),
 						},
 					],
-					details: { nodeMethod: "flash_lights", params: {} },
 				};
 			},
 		},
@@ -134,14 +135,14 @@ export function registerSecurityTools(api: OpenClawPluginApi): void {
 				"the vehicle or alerting nearby people. Auto-wakes the vehicle if asleep.",
 			parameters: Type.Object({}),
 			async execute(_toolCallId: string, _params: Record<string, unknown>) {
+				const result = await invokeTescmdNode("honk_horn", {});
 				return {
 					content: [
 						{
 							type: "text" as const,
-							text: "Invoking honk_horn on tescmd node",
+							text: JSON.stringify(result, null, 2),
 						},
 					],
-					details: { nodeMethod: "honk_horn", params: {} },
 				};
 			},
 		},
@@ -165,14 +166,14 @@ export function registerSecurityTools(api: OpenClawPluginApi): void {
 				"\n\nWorkflow: tescmd_lock_doors → tescmd_sentry_on → optionally tescmd_location_trigger (geofence).",
 			parameters: Type.Object({}),
 			async execute(_toolCallId: string, _params: Record<string, unknown>) {
+				const result = await invokeTescmdNode("sentry.on", {});
 				return {
 					content: [
 						{
 							type: "text" as const,
-							text: "Invoking sentry.on on tescmd node",
+							text: JSON.stringify(result, null, 2),
 						},
 					],
-					details: { nodeMethod: "sentry.on", params: {} },
 				};
 			},
 		},
@@ -191,14 +192,14 @@ export function registerSecurityTools(api: OpenClawPluginApi): void {
 				"and reduces battery drain. Returns {result: true, reason: 'ok'}.",
 			parameters: Type.Object({}),
 			async execute(_toolCallId: string, _params: Record<string, unknown>) {
+				const result = await invokeTescmdNode("sentry.off", {});
 				return {
 					content: [
 						{
 							type: "text" as const,
-							text: "Invoking sentry.off on tescmd node",
+							text: JSON.stringify(result, null, 2),
 						},
 					],
-					details: { nodeMethod: "sentry.off", params: {} },
 				};
 			},
 		},

@@ -9,6 +9,7 @@
 
 import { Type } from "@sinclair/typebox";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
+import { getTescmdNodeId } from "./utils.js";
 
 export function registerStatusTool(api: OpenClawPluginApi): void {
 	api.registerTool(
@@ -28,18 +29,48 @@ export function registerStatusTool(api: OpenClawPluginApi): void {
 				"If connected is false, all other vehicle tools will fail.",
 			parameters: Type.Object({}),
 			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: "Checking tescmd node connection status...",
-						},
-					],
-					details: {
-						gatewayQuery: "node.status",
-						platform: "tescmd",
-					},
-				};
+				try {
+					const nodeId = await getTescmdNodeId(true);
+					if (nodeId) {
+						return {
+							content: [
+								{
+									type: "text" as const,
+									text: JSON.stringify(
+										{
+											connected: true,
+											node_id: nodeId,
+											platform: "tesla",
+										},
+										null,
+										2,
+									),
+								},
+							],
+						};
+					} else {
+						return {
+							content: [
+								{
+									type: "text" as const,
+									text: JSON.stringify(
+										{
+											connected: false,
+											platform: "tesla",
+										},
+										null,
+										2,
+									),
+								},
+							],
+						};
+					}
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_node_status" },

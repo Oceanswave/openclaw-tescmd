@@ -12,6 +12,7 @@
 
 import { Type } from "@sinclair/typebox";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
+import { invokeTescmdNode } from "./utils.js";
 
 export function registerSystemTools(api: OpenClawPluginApi): void {
 	api.registerTool(
@@ -40,7 +41,7 @@ export function registerSystemTools(api: OpenClawPluginApi): void {
 					description: "Command method name — dot-notation (door.lock) or snake_case (door_lock)",
 				}),
 				params: Type.Optional(
-					Type.Record(Type.String(), Type.Object({}), {
+					Type.Record(Type.String(), Type.Any(), {
 						description: "Optional parameters to pass to the command",
 					}),
 				),
@@ -48,18 +49,17 @@ export function registerSystemTools(api: OpenClawPluginApi): void {
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
 				const method = params.method as string;
 				const cmdParams = (params.params as Record<string, unknown>) ?? {};
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: `Invoking system.run with method=${method} on tescmd node`,
-						},
-					],
-					details: {
-						nodeMethod: "system.run",
-						params: { method, params: cmdParams },
-					},
-				};
+				try {
+					const result = await invokeTescmdNode("system.run", { method, params: cmdParams });
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_run_command" },

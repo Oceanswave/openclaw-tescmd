@@ -61,11 +61,18 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 				"Each trigger monitors a telemetry field and fires when the condition " +
 				"is met. Use trigger IDs from this list with tescmd_delete_trigger.",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				const result = await invokeTescmdNode("trigger.list", {});
-				return {
-					content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("trigger.list", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_list_triggers" },
@@ -85,11 +92,18 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 				"Drains the pending notification queue — calling again immediately " +
 				"will return empty unless new triggers have fired.",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				const result = await invokeTescmdNode("trigger.poll", {});
-				return {
-					content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("trigger.poll", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_poll_triggers" },
@@ -127,15 +141,22 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 				),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
-				const result = await invokeTescmdNode("trigger.create", params);
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: JSON.stringify(result, null, 2),
-						},
-					],
-				};
+				try {
+					const result = await invokeTescmdNode("trigger.create", params);
+					return {
+						content: [
+							{
+								type: "text" as const,
+								text: JSON.stringify(result, null, 2),
+							},
+						],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_create_trigger" },
@@ -155,15 +176,22 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 				id: Type.String({ description: "The trigger ID to delete" }),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
-				const result = await invokeTescmdNode("trigger.delete", { id: params.id });
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: JSON.stringify(result, null, 2),
-						},
-					],
-				};
+				try {
+					const result = await invokeTescmdNode("trigger.delete", { id: params.id });
+					return {
+						content: [
+							{
+								type: "text" as const,
+								text: JSON.stringify(result, null, 2),
+							},
+						],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_delete_trigger" },
@@ -191,15 +219,22 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 				),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
-				const result = await invokeTescmdNode("cabin_temp.trigger", params);
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: JSON.stringify(result, null, 2),
-						},
-					],
-				};
+				try {
+					const result = await invokeTescmdNode("cabin_temp.trigger", params);
+					return {
+						content: [
+							{
+								type: "text" as const,
+								text: JSON.stringify(result, null, 2),
+							},
+						],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_cabin_temp_trigger" },
@@ -222,15 +257,22 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 				),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
-				const result = await invokeTescmdNode("outside_temp.trigger", params);
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: JSON.stringify(result, null, 2),
-						},
-					],
-				};
+				try {
+					const result = await invokeTescmdNode("outside_temp.trigger", params);
+					return {
+						content: [
+							{
+								type: "text" as const,
+								text: JSON.stringify(result, null, 2),
+							},
+						],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_outside_temp_trigger" },
@@ -254,15 +296,22 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 				),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
-				const result = await invokeTescmdNode("battery.trigger", params);
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: JSON.stringify(result, null, 2),
-						},
-					],
-				};
+				try {
+					const result = await invokeTescmdNode("battery.trigger", params);
+					return {
+						content: [
+							{
+								type: "text" as const,
+								text: JSON.stringify(result, null, 2),
+							},
+						],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_battery_trigger" },
@@ -294,15 +343,22 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 				),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
-				const result = await invokeTescmdNode("location.trigger", params);
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: JSON.stringify(result, null, 2),
-						},
-					],
-				};
+				try {
+					const result = await invokeTescmdNode("location.trigger", params);
+					return {
+						content: [
+							{
+								type: "text" as const,
+								text: JSON.stringify(result, null, 2),
+							},
+						],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_location_trigger" },

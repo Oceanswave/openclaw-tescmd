@@ -18,6 +18,12 @@
  */
 
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
+import { getTescmdNodeId, invokeTescmdNode } from "../tools/utils.js";
+
+// Helper to format temperature from Celsius to Fahrenheit
+function cToF(c: number): number {
+	return Math.round((c * 9) / 5 + 32);
+}
 
 export function registerSlashCommands(api: OpenClawPluginApi): void {
 	api.registerCommand({
@@ -26,9 +32,22 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 		acceptsArgs: false,
 		requireAuth: true,
 		async handler(_ctx) {
-			return {
-				text: "Checking battery status via tescmd node...\n" + "_Invoking: battery.get_",
-			};
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+				const result = await invokeTescmdNode<{ battery_level: number; range_miles: number }>(
+					"battery.get",
+				);
+				return {
+					text: `🔋 **Battery:** ${result.battery_level}%\n🛣️ **Range:** ${Math.round(result.range_miles)} miles`,
+				};
+			} catch (err) {
+				return {
+					text: `❌ Failed to get battery: ${err instanceof Error ? err.message : String(err)}`,
+				};
+			}
 		},
 	});
 
@@ -38,24 +57,44 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 		acceptsArgs: true,
 		requireAuth: true,
 		async handler(ctx) {
-			const arg = ctx.args?.trim().toLowerCase();
-			if (arg === "start") {
-				return { text: "Starting charge via tescmd node...\n_Invoking: charge.start_" };
-			}
-			if (arg === "stop") {
-				return { text: "Stopping charge via tescmd node...\n_Invoking: charge.stop_" };
-			}
-			if (arg && /^\d+$/.test(arg)) {
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+
+				const arg = ctx.args?.trim().toLowerCase();
+
+				if (arg === "start") {
+					await invokeTescmdNode("charge.start");
+					return { text: "⚡ Charging started!" };
+				}
+				if (arg === "stop") {
+					await invokeTescmdNode("charge.stop");
+					return { text: "🔌 Charging stopped." };
+				}
+				if (arg && /^\d+$/.test(arg)) {
+					const percent = parseInt(arg, 10);
+					if (percent < 50 || percent > 100) {
+						return { text: "❌ Charge limit must be between 50-100%" };
+					}
+					await invokeTescmdNode("charge.set_limit", { percent });
+					return { text: `🔋 Charge limit set to ${percent}%` };
+				}
+
+				// Default: show status
+				const [battery, chargeState] = await Promise.all([
+					invokeTescmdNode<{ battery_level: number; range_miles: number }>("battery.get"),
+					invokeTescmdNode<{ charge_state: string }>("charge_state.get"),
+				]);
 				return {
-					text: `Setting charge limit to ${arg}% via tescmd node...\n_Invoking: charge.set_limit_`,
+					text: `⚡ **Charge State:** ${chargeState.charge_state}\n🔋 **Battery:** ${battery.battery_level}%\n🛣️ **Range:** ${Math.round(battery.range_miles)} mi\n\n_Usage: /charge start | stop | <limit%>_`,
+				};
+			} catch (err) {
+				return {
+					text: `❌ Charge command failed: ${err instanceof Error ? err.message : String(err)}`,
 				};
 			}
-			return {
-				text:
-					"Checking charge state via tescmd node...\n" +
-					"_Invoking: charge_state.get + battery.get_\n\n" +
-					"**Usage:** `/charge` (status) | `/charge start` | `/charge stop` | `/charge 80` (set limit)",
-			};
 		},
 	});
 
@@ -65,24 +104,44 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 		acceptsArgs: true,
 		requireAuth: true,
 		async handler(ctx) {
-			const arg = ctx.args?.trim().toLowerCase();
-			if (arg === "on") {
-				return { text: "Turning on climate via tescmd node...\n_Invoking: climate.on_" };
-			}
-			if (arg === "off") {
-				return { text: "Turning off climate via tescmd node...\n_Invoking: climate.off_" };
-			}
-			if (arg && /^\d+$/.test(arg)) {
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+
+				const arg = ctx.args?.trim().toLowerCase();
+
+				if (arg === "on") {
+					await invokeTescmdNode("climate.on");
+					return { text: "❄️ Climate control turned ON" };
+				}
+				if (arg === "off") {
+					await invokeTescmdNode("climate.off");
+					return { text: "🔇 Climate control turned OFF" };
+				}
+				if (arg && /^\d+$/.test(arg)) {
+					const temp = parseInt(arg, 10);
+					if (temp < 60 || temp > 85) {
+						return { text: "❌ Temperature must be between 60-85°F" };
+					}
+					await invokeTescmdNode("climate.on");
+					await invokeTescmdNode("climate.set_temp", { temp });
+					return { text: `🌡️ Climate set to ${temp}°F` };
+				}
+
+				// Default: show temperature
+				const result = await invokeTescmdNode<{ inside_temp_c: number; outside_temp_c: number }>(
+					"temperature.get",
+				);
 				return {
-					text: `Setting temperature to ${arg}°F via tescmd node...\n_Invoking: climate.set_temp_`,
+					text: `🚗 **Inside:** ${cToF(result.inside_temp_c)}°F (${result.inside_temp_c.toFixed(1)}°C)\n🌡️ **Outside:** ${cToF(result.outside_temp_c)}°F (${result.outside_temp_c}°C)\n\n_Usage: /climate on | off | <temp°F>_`,
+				};
+			} catch (err) {
+				return {
+					text: `❌ Climate command failed: ${err instanceof Error ? err.message : String(err)}`,
 				};
 			}
-			return {
-				text:
-					"Checking temperature via tescmd node...\n" +
-					"_Invoking: temperature.get_\n\n" +
-					"**Usage:** `/climate` (check) | `/climate on` | `/climate off` | `/climate 72` (set °F)",
-			};
 		},
 	});
 
@@ -92,7 +151,16 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 		acceptsArgs: false,
 		requireAuth: true,
 		async handler(_ctx) {
-			return { text: "Locking doors via tescmd node...\n_Invoking: door.lock_" };
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+				await invokeTescmdNode("door.lock");
+				return { text: "🔒 Doors locked!" };
+			} catch (err) {
+				return { text: `❌ Failed to lock: ${err instanceof Error ? err.message : String(err)}` };
+			}
 		},
 	});
 
@@ -102,7 +170,16 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 		acceptsArgs: false,
 		requireAuth: true,
 		async handler(_ctx) {
-			return { text: "Unlocking doors via tescmd node...\n_Invoking: door.unlock_" };
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+				await invokeTescmdNode("door.unlock");
+				return { text: "🔓 Doors unlocked!" };
+			} catch (err) {
+				return { text: `❌ Failed to unlock: ${err instanceof Error ? err.message : String(err)}` };
+			}
 		},
 	});
 
@@ -112,19 +189,37 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 		acceptsArgs: true,
 		requireAuth: true,
 		async handler(ctx) {
-			const arg = ctx.args?.trim().toLowerCase();
-			if (arg === "on") {
-				return { text: "Enabling Sentry Mode via tescmd node...\n_Invoking: sentry.on_" };
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+
+				const arg = ctx.args?.trim().toLowerCase();
+
+				if (arg === "on") {
+					await invokeTescmdNode("sentry.on");
+					return { text: "👁️ Sentry Mode enabled" };
+				}
+				if (arg === "off") {
+					await invokeTescmdNode("sentry.off");
+					return { text: "😴 Sentry Mode disabled" };
+				}
+
+				// Default: show status
+				const result = await invokeTescmdNode<{ locked: boolean; sentry_mode: boolean }>(
+					"security.get",
+				);
+				const lockStatus = result.locked ? "🔒 Locked" : "🔓 Unlocked";
+				const sentryStatus = result.sentry_mode ? "👁️ ON" : "😴 OFF";
+				return {
+					text: `**Doors:** ${lockStatus}\n**Sentry:** ${sentryStatus}\n\n_Usage: /sentry on | off_`,
+				};
+			} catch (err) {
+				return {
+					text: `❌ Sentry command failed: ${err instanceof Error ? err.message : String(err)}`,
+				};
 			}
-			if (arg === "off") {
-				return { text: "Disabling Sentry Mode via tescmd node...\n_Invoking: sentry.off_" };
-			}
-			return {
-				text:
-					"Checking security status via tescmd node...\n" +
-					"_Invoking: security.get_\n\n" +
-					"**Usage:** `/sentry` (check) | `/sentry on` | `/sentry off`",
-			};
 		},
 	});
 
@@ -134,9 +229,27 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 		acceptsArgs: false,
 		requireAuth: true,
 		async handler(_ctx) {
-			return {
-				text: "Getting vehicle location via tescmd node...\n_Invoking: location.get_",
-			};
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+				const result = await invokeTescmdNode<{
+					latitude: number;
+					longitude: number;
+					heading: number;
+					speed: number;
+				}>("location.get");
+				const mapsUrl = `https://maps.google.com/?q=${result.latitude},${result.longitude}`;
+				const speedMph = result.speed ? `${Math.round(result.speed)} mph` : "parked";
+				return {
+					text: `📍 **Location:** ${result.latitude.toFixed(5)}, ${result.longitude.toFixed(5)}\n🧭 **Heading:** ${Math.round(result.heading)}°\n🚗 **Speed:** ${speedMph}\n\n[Open in Maps](${mapsUrl})`,
+				};
+			} catch (err) {
+				return {
+					text: `❌ Failed to get location: ${err instanceof Error ? err.message : String(err)}`,
+				};
+			}
 		},
 	});
 
@@ -146,15 +259,185 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 		acceptsArgs: false,
 		requireAuth: true,
 		async handler(_ctx) {
-			return {
-				text:
-					"Fetching full vehicle status via tescmd node...\n" +
-					"_Invoking: battery.get + charge_state.get + temperature.get + security.get + location.get_",
-			};
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+
+				const [battery, chargeState, temp, security, location] = await Promise.all([
+					invokeTescmdNode<{ battery_level: number; range_miles: number }>("battery.get"),
+					invokeTescmdNode<{ charge_state: string }>("charge_state.get"),
+					invokeTescmdNode<{ inside_temp_c: number; outside_temp_c: number }>("temperature.get"),
+					invokeTescmdNode<{ locked: boolean; sentry_mode: boolean }>("security.get"),
+					invokeTescmdNode<{ latitude: number; longitude: number; speed: number }>("location.get"),
+				]);
+
+				const lockStatus = security.locked ? "🔒 Locked" : "🔓 Unlocked";
+				const sentryStatus = security.sentry_mode ? "👁️ Sentry ON" : "Sentry OFF";
+				const speedMph = location.speed ? `${Math.round(location.speed)} mph` : "Parked";
+				const mapsUrl = `https://maps.google.com/?q=${location.latitude},${location.longitude}`;
+
+				return {
+					text: [
+						"🚗 **Vehicle Status**",
+						"",
+						`🔋 **Battery:** ${battery.battery_level}% (${Math.round(battery.range_miles)} mi)`,
+						`⚡ **Charging:** ${chargeState.charge_state}`,
+						`🌡️ **Cabin:** ${cToF(temp.inside_temp_c)}°F | Outside: ${cToF(temp.outside_temp_c)}°F`,
+						`🔐 **Security:** ${lockStatus} | ${sentryStatus}`,
+						`📍 **Location:** ${speedMph} — [Map](${mapsUrl})`,
+					].join("\n"),
+				};
+			} catch (err) {
+				return {
+					text: `❌ Failed to get vehicle status: ${err instanceof Error ? err.message : String(err)}`,
+				};
+			}
+		},
+	});
+
+	api.registerCommand({
+		name: "nav",
+		description: "Send destination to vehicle navigation",
+		acceptsArgs: true,
+		requireAuth: true,
+		async handler(ctx) {
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+
+				const address = ctx.args?.trim();
+				if (!address) {
+					return {
+						text: "❌ Usage: `/nav <address or place name>`\n\nExample: `/nav 1600 Amphitheatre Parkway, Mountain View, CA`",
+					};
+				}
+
+				await invokeTescmdNode("nav.send", { address });
+				return { text: `🧭 Sent to navigation: **${address}**` };
+			} catch (err) {
+				return {
+					text: `❌ Failed to send destination: ${err instanceof Error ? err.message : String(err)}`,
+				};
+			}
+		},
+	});
+
+	api.registerCommand({
+		name: "flash",
+		description: "Flash the vehicle headlights",
+		acceptsArgs: false,
+		requireAuth: true,
+		async handler(_ctx) {
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+				await invokeTescmdNode("flash_lights");
+				return { text: "💡 Headlights flashed!" };
+			} catch (err) {
+				return {
+					text: `❌ Failed to flash lights: ${err instanceof Error ? err.message : String(err)}`,
+				};
+			}
+		},
+	});
+
+	api.registerCommand({
+		name: "honk",
+		description: "Honk the vehicle horn",
+		acceptsArgs: false,
+		requireAuth: true,
+		async handler(_ctx) {
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+				await invokeTescmdNode("honk_horn");
+				return { text: "📢 Horn honked!" };
+			} catch (err) {
+				return { text: `❌ Failed to honk: ${err instanceof Error ? err.message : String(err)}` };
+			}
+		},
+	});
+
+	api.registerCommand({
+		name: "trunk",
+		description: "Open/close the rear trunk",
+		acceptsArgs: false,
+		requireAuth: true,
+		async handler(_ctx) {
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+				await invokeTescmdNode("trunk.open");
+				return { text: "🚗 Trunk actuated!" };
+			} catch (err) {
+				return {
+					text: `❌ Failed to actuate trunk: ${err instanceof Error ? err.message : String(err)}`,
+				};
+			}
+		},
+	});
+
+	api.registerCommand({
+		name: "frunk",
+		description: "Open the front trunk (frunk)",
+		acceptsArgs: false,
+		requireAuth: true,
+		async handler(_ctx) {
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+				await invokeTescmdNode("frunk.open");
+				return { text: "🚗 Frunk opened! (Must be closed manually)" };
+			} catch (err) {
+				return {
+					text: `❌ Failed to open frunk: ${err instanceof Error ? err.message : String(err)}`,
+				};
+			}
+		},
+	});
+
+	api.registerCommand({
+		name: "homelink",
+		description: "Trigger HomeLink (garage door)",
+		acceptsArgs: false,
+		requireAuth: true,
+		async handler(_ctx) {
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+
+				// Get current location first
+				const location = await invokeTescmdNode<{ latitude: number; longitude: number }>(
+					"location.get",
+				);
+				await invokeTescmdNode("homelink.trigger", {
+					lat: location.latitude,
+					lon: location.longitude,
+				});
+				return { text: "🏠 HomeLink triggered!" };
+			} catch (err) {
+				return {
+					text: `❌ Failed to trigger HomeLink: ${err instanceof Error ? err.message : String(err)}`,
+				};
+			}
 		},
 	});
 
 	api.logger.info(
-		"Registered 8 slash commands: /battery /charge /climate /lock /unlock /sentry /location /vehicle",
+		"Registered 14 slash commands: /battery /charge /climate /lock /unlock /sentry /location /vehicle /nav /flash /honk /trunk /frunk /homelink",
 	);
 }

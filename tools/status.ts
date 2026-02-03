@@ -37,7 +37,7 @@ export function registerStatusTool(api: OpenClawPluginApi): void {
 					],
 					details: {
 						gatewayQuery: "node.status",
-						platform: "tesla",
+						platform: "tescmd",
 					},
 				};
 			},

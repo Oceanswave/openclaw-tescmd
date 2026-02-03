@@ -34,7 +34,6 @@
  */
 
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
-import { registerCliCommands } from "./commands/cli.js";
 import { registerSlashCommands } from "./commands/slash.js";
 import { type TescmdConfig, tescmdConfigSchema } from "./config.js";
 import { registerCapabilitiesTool } from "./tools/capabilities.js";
@@ -79,9 +78,8 @@ export default {
 		registerTriggerTools(api);
 		registerSystemTools(api);
 
-		// Register slash commands and CLI subcommands
+		// Register slash commands
 		registerSlashCommands(api);
-		registerCliCommands(api);
 
 		// Register a service for lifecycle logging
 		api.registerService({

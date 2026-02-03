@@ -1,3 +1,7 @@
+import * as fs from "node:fs";
+import * as path from "node:path";
+import * as os from "node:os";
+
 // Utils for tescmd plugin - uses /tools/invoke HTTP endpoint
 
 type NodeInfo = {
@@ -17,11 +21,30 @@ type ToolsInvokeResponse = {
 };
 
 let cachedNodeId: string | null = null;
+let cachedToken: string | null = null;
+
+function getToken(): string {
+	if (cachedToken !== null) return cachedToken;
+	
+	// Try env var first
+	let token = process.env.OPENCLAW_GATEWAY_TOKEN || "";
+	if (!token) {
+		try {
+			const configPath = path.join(os.homedir(), ".openclaw", "openclaw.json");
+			const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+			token = config.gateway?.token || "";
+		} catch {
+			// ignore
+		}
+	}
+	cachedToken = token;
+	return token;
+}
 
 // Use fetch to call the gateway's /tools/invoke HTTP endpoint
 async function callTool<T>(toolName: string, action: string, args: Record<string, unknown>): Promise<T> {
 	const port = process.env.OPENCLAW_GATEWAY_PORT || "18789";
-	const token = process.env.OPENCLAW_GATEWAY_TOKEN || "";
+	const token = getToken();
 	
 	const body = { tool: toolName, action, args };
 	

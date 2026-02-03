@@ -2,8 +2,8 @@
 name: tescmd
 slug: tescmd
 displayName: Tesla Vehicle Control
-version: 0.4.1
-description: Control and monitor Tesla vehicles via the tescmd node. Get battery, climate, location, lock/unlock doors, start/stop charging, and more.
+version: 0.9.1
+description: Control and monitor Tesla vehicles via the tescmd node. Get battery, climate, location, lock/unlock doors, start/stop charging, find Superchargers, and more.
 homepage: https://github.com/oceanswave/openclaw-tescmd
 metadata: {"category":"platform","platform":"tesla","node":"tescmd"}
 ---
@@ -19,9 +19,10 @@ Control and monitor Tesla vehicles through the OpenClaw Gateway. This skill cove
 
 Verify connection:
 ```bash
-openclaw tescmd status
 openclaw nodes status
 ```
+
+Or use the agent tool: `tescmd_node_status`
 
 ---
 
@@ -44,7 +45,7 @@ openclaw nodes status
 |------|------|
 | Turn on climate | `tescmd_climate_on` |
 | Turn off climate | `tescmd_climate_off` |
-| Set temperature | `tescmd_set_temperature` (temp in °F) |
+| Set temperature | `tescmd_set_climate_temp` (temp in °F) |
 
 ### Security
 
@@ -76,10 +77,41 @@ openclaw nodes status
 
 | Task | Tool | Parameters |
 |------|------|------------|
-| Send address | `tescmd_nav_send` | `destination` (address string) |
+| Send address | `tescmd_nav_send` | `address` (address string) |
 | Send GPS coords | `tescmd_nav_gps` | `lat`, `lon`, optional `order` |
 | Navigate to supercharger | `tescmd_nav_supercharger` | |
+| Multi-stop route | `tescmd_nav_waypoints` | `waypoints` (comma-separated Place IDs) |
 | Trigger HomeLink | `tescmd_homelink` | `lat`, `lon` |
+
+---
+
+## Supercharger Discovery
+
+Find Tesla Superchargers anywhere, powered by [supercharge.info](https://supercharge.info):
+
+| Task | Tool | Parameters |
+|------|------|------------|
+| Find nearby | `tescmd_superchargers_near` | `latitude`, `longitude`, optional `radius_miles`, `limit` |
+| Find along route | `tescmd_superchargers_route` | `start_lat`, `start_lon`, `end_lat`, `end_lon`, optional `corridor_miles` |
+| Search by name/city | `tescmd_superchargers_search` | `query`, optional `status`, `limit` |
+
+### Example Workflows
+
+**Road trip planning:**
+```
+"Road trip to Asheville — find Superchargers along the way"
+→ Get Asheville coords with goplaces
+→ tescmd_superchargers_route with start/end coords
+→ Returns Superchargers with distance, stall count, power level
+```
+
+**Find charging near destination:**
+```
+"Is there a Supercharger near the restaurant?"
+→ Get restaurant coords
+→ tescmd_superchargers_near
+→ Returns closest Superchargers with distance
+```
 
 ---
 
@@ -91,10 +123,10 @@ Set up alerts when telemetry values cross thresholds.
 
 | Task | Tool |
 |------|------|
-| List active triggers | `tescmd_trigger_list` |
-| Poll for fired triggers | `tescmd_trigger_poll` |
-| Create custom trigger | `tescmd_trigger_create` |
-| Delete trigger | `tescmd_trigger_delete` |
+| List active triggers | `tescmd_list_triggers` |
+| Poll for fired triggers | `tescmd_poll_triggers` |
+| Create custom trigger | `tescmd_create_trigger` |
+| Delete trigger | `tescmd_delete_trigger` |
 
 ### Convenience Trigger Tools
 
@@ -127,14 +159,21 @@ Create a trigger to alert me when battery drops below 20%
 
 1. Check current temperature: `tescmd_get_temperature`
 2. Turn on climate: `tescmd_climate_on`
-3. Optionally set temp: `tescmd_set_temperature` with desired °F
+3. Optionally set temp: `tescmd_set_climate_temp` with desired °F
 4. Check battery: `tescmd_get_battery`
 
 ### Send a Route to the Car
 
 1. Use `tescmd_nav_send` with the destination address
 2. Or use `tescmd_nav_gps` for exact coordinates
-3. For multi-stop, send waypoints in order using the `order` parameter
+3. For multi-stop, send waypoints in order using `tescmd_nav_waypoints`
+
+### Plan a Road Trip with Charging
+
+1. Get start/end coordinates
+2. Call `tescmd_superchargers_route` to find Superchargers along the way
+3. Review options (stall count, power level, distance)
+4. Send destination with `tescmd_nav_send`
 
 ### Monitor Charging
 
@@ -158,18 +197,24 @@ Create a trigger to alert me when battery drops below 20%
 
 ## Slash Commands
 
-Quick commands available from chat:
+Quick commands available from chat (14 total):
 
 | Command | Description |
 |---------|-------------|
 | `/battery` | Battery level and range |
-| `/charge` | Charging status |
-| `/climate` | Climate/temperature info |
+| `/charge [start\|stop\|80]` | Charging control |
+| `/climate [on\|off\|72]` | Climate/temperature control |
 | `/lock` | Lock the vehicle |
 | `/unlock` | Unlock the vehicle |
-| `/sentry` | Toggle sentry mode |
-| `/location` | Vehicle location |
-| `/vehicle` | Full vehicle summary |
+| `/sentry [on\|off]` | Sentry mode control |
+| `/location` | Vehicle location with map link |
+| `/vehicle` | Full vehicle status summary |
+| `/nav <address>` | Send destination to navigation |
+| `/flash` | Flash headlights |
+| `/honk` | Honk horn |
+| `/trunk` | Open/close rear trunk |
+| `/frunk` | Open front trunk |
+| `/homelink` | Trigger garage door |
 
 ---
 
@@ -179,6 +224,7 @@ Quick commands available from chat:
 - **Signed commands**: Door lock/unlock use signed Vehicle Command Protocol for security
 - **Telemetry**: Real-time data (location, temp, battery) comes from Fleet Telemetry stream — instant when available, falls back to API polling
 - **Triggers**: Require telemetry streaming enabled (default). Use `--fields all` when starting the node for full coverage.
+- **Superchargers**: Data from supercharge.info, cached for 1 hour. Community-maintained, 10,000+ locations worldwide.
 
 ---
 

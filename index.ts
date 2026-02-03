@@ -2,8 +2,9 @@
  * OpenClaw plugin: openclaw-tescmd
  *
  * Registers the Tesla vehicle platform with the OpenClaw Gateway,
- * whitelists all 34 tescmd node commands, and exposes 37 richly-documented
- * agent-callable tools for vehicle control and telemetry monitoring.
+ * whitelists all 34 tescmd node commands, and exposes 40 richly-documented
+ * agent-callable tools for vehicle control, telemetry monitoring, and
+ * Supercharger discovery via supercharge.info API.
  *
  * The tescmd node (https://github.com/oceanswave/tescmd) connects to the
  * Tesla Fleet API and streams real-time telemetry data.  This plugin
@@ -14,20 +15,22 @@
  * Architecture:
  *   Agent → OpenClaw Gateway → [this plugin routes to] → tescmd node → Tesla Fleet API → Vehicle
  *
- * Tool categories (37 tools):
- *   - Help (1):       capabilities reference and workflow guide (tescmd_help)
- *   - Status (1):     node connection health check (tescmd_node_status)
- *   - Vehicle (3):    location, battery, speed
- *   - Charge (4):     charge state, start/stop/limit
- *   - Climate (4):    temperature, HVAC on/off, set temp
- *   - Security (7):   lock state, lock/unlock, flash, honk, sentry on/off
- *   - Trunk (2):      trunk, frunk
- *   - Navigation (5): send destination, GPS, supercharger, waypoints, homelink
- *   - Triggers (8):   list, poll, create, delete, + 4 convenience aliases
- *   - System (1):     meta-dispatch (system.run)
+ * Tool categories (40 tools):
+ *   - Help (1):          capabilities reference and workflow guide (tescmd_help)
+ *   - Status (1):        node connection health check (tescmd_node_status)
+ *   - Vehicle (3):       location, battery, speed
+ *   - Charge (4):        charge state, start/stop/limit
+ *   - Climate (4):       temperature, HVAC on/off, set temp
+ *   - Security (7):      lock state, lock/unlock, flash, honk, sentry on/off
+ *   - Trunk (2):         trunk, frunk
+ *   - Navigation (5):    send destination, GPS, supercharger, waypoints, homelink
+ *   - Superchargers (3): find nearby, along route, search by name
+ *   - Triggers (8):      list, poll, create, delete, + 4 convenience aliases
+ *   - System (1):        meta-dispatch (system.run)
  *
- * Slash commands (8):
- *   /battery, /charge, /climate, /lock, /unlock, /sentry, /location, /vehicle
+ * Slash commands (14):
+ *   /battery, /charge, /climate, /lock, /unlock, /sentry, /location, /vehicle,
+ *   /nav, /flash, /honk, /trunk, /frunk, /homelink
  *
  * CLI subcommands:
  *   openclaw tescmd status | commands | events
@@ -42,6 +45,7 @@ import { registerClimateTools } from "./tools/climate.js";
 import { registerNavigationTools } from "./tools/navigation.js";
 import { registerSecurityTools } from "./tools/security.js";
 import { registerStatusTool } from "./tools/status.js";
+import { registerSuperchargerTools } from "./tools/superchargers.js";
 import { registerSystemTools } from "./tools/system.js";
 import { registerTriggerTools } from "./tools/triggers.js";
 import { registerTrunkTools } from "./tools/trunk.js";
@@ -77,6 +81,7 @@ export default {
 		registerNavigationTools(api);
 		registerTriggerTools(api);
 		registerSystemTools(api);
+		registerSuperchargerTools(api);
 
 		// Register slash commands
 		registerSlashCommands(api);
@@ -87,8 +92,8 @@ export default {
 			start() {
 				api.logger.info(
 					"openclaw-tescmd platform plugin active — " +
-						"34 commands whitelisted, 37 tools registered, " +
-						"8 slash commands, 3 CLI subcommands",
+						"34 commands whitelisted, 40 tools registered, " +
+						"14 slash commands, 3 CLI subcommands",
 				);
 			},
 			stop() {

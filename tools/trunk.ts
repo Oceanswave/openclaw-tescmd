@@ -24,16 +24,18 @@ export function registerTrunkTools(api: OpenClawPluginApi): void {
 				"On models without power close, the trunk will open but must be " +
 				"physically closed. Auto-wakes the vehicle if asleep.",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				const result = await invokeTescmdNode("trunk.open", {});
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: JSON.stringify(result, null, 2),
-						},
-					],
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("trunk.open", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_open_trunk" },
@@ -51,16 +53,18 @@ export function registerTrunkTools(api: OpenClawPluginApi): void {
 				"only be opened remotely — it cannot be closed remotely and must be " +
 				"physically pushed down to close. Auto-wakes the vehicle if asleep.",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				const result = await invokeTescmdNode("frunk.open", {});
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: JSON.stringify(result, null, 2),
-						},
-					],
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("frunk.open", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_open_frunk" },

@@ -9,6 +9,7 @@
 
 import { Type } from "@sinclair/typebox";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
+import { invokeTescmdNode } from "./utils.js";
 
 export function registerVehicleTools(api: OpenClawPluginApi): void {
 	// -----------------------------------------------------------------
@@ -28,19 +29,18 @@ export function registerVehicleTools(api: OpenClawPluginApi): void {
 				"\n\nData source: Real-time telemetry (instant) → Fleet API drive_state (may need wake). " +
 				"If response contains {pending: true}, data is being fetched — retry in a few seconds.",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: "Invoking location.get on tescmd node",
-						},
-					],
-					details: {
-						nodeMethod: "location.get",
-						params: {},
-					},
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("location.get", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_get_location" },
@@ -62,19 +62,18 @@ export function registerVehicleTools(api: OpenClawPluginApi): void {
 				"charging picture. " +
 				"\n\nData source: Soc/BatteryLevel telemetry (instant) → Fleet API charge_state (may need wake).",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: "Invoking battery.get on tescmd node",
-						},
-					],
-					details: {
-						nodeMethod: "battery.get",
-						params: {},
-					},
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("battery.get", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_get_battery" },
@@ -95,19 +94,18 @@ export function registerVehicleTools(api: OpenClawPluginApi): void {
 				"stationary), or for trip monitoring. " +
 				"\n\nData source: VehicleSpeed telemetry (instant) → Fleet API drive_state (may need wake).",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: "Invoking speed.get on tescmd node",
-						},
-					],
-					details: {
-						nodeMethod: "speed.get",
-						params: {},
-					},
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("speed.get", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_get_speed" },

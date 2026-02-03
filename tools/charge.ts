@@ -8,6 +8,7 @@
 
 import { Type } from "@sinclair/typebox";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
+import { invokeTescmdNode } from "./utils.js";
 
 export function registerChargeTools(api: OpenClawPluginApi): void {
 	// -----------------------------------------------------------------
@@ -25,16 +26,18 @@ export function registerChargeTools(api: OpenClawPluginApi): void {
 				"tescmd_get_battery for a complete charging picture (state + level + range). " +
 				"\n\nData source: ChargeState/DetailedChargeState telemetry → Fleet API charge_state.",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: "Invoking charge_state.get on tescmd node",
-						},
-					],
-					details: { nodeMethod: "charge_state.get", params: {} },
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("charge_state.get", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_get_charge_state" },
@@ -57,16 +60,18 @@ export function registerChargeTools(api: OpenClawPluginApi): void {
 				"\n\nWorkflow: tescmd_get_charge_state → verify connected → tescmd_start_charge → " +
 				"optionally tescmd_set_charge_limit if user specified a target.",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: "Invoking charge.start on tescmd node",
-						},
-					],
-					details: { nodeMethod: "charge.start", params: {} },
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("charge.start", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_start_charge" },
@@ -84,16 +89,18 @@ export function registerChargeTools(api: OpenClawPluginApi): void {
 				"Returns {result: true, reason: 'ok'} on success. " +
 				"Has no effect if the vehicle is not currently charging.",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: "Invoking charge.stop on tescmd node",
-						},
-					],
-					details: { nodeMethod: "charge.stop", params: {} },
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("charge.stop", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_stop_charge" },
@@ -122,18 +129,17 @@ export function registerChargeTools(api: OpenClawPluginApi): void {
 				}),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: `Invoking charge.set_limit with percent=${params.percent} on tescmd node`,
-						},
-					],
-					details: {
-						nodeMethod: "charge.set_limit",
-						params: { percent: params.percent },
-					},
-				};
+				try {
+					const result = await invokeTescmdNode("charge.set_limit", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_set_charge_limit" },

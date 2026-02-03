@@ -6,6 +6,7 @@
 
 import { Type } from "@sinclair/typebox";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
+import { invokeTescmdNode } from "./utils.js";
 
 export function registerClimateTools(api: OpenClawPluginApi): void {
 	// -----------------------------------------------------------------
@@ -24,16 +25,18 @@ export function registerClimateTools(api: OpenClawPluginApi): void {
 				"\n\nWorkflow: tescmd_get_temperature → decide → tescmd_climate_on + tescmd_set_climate_temp. " +
 				"\n\nData source: InsideTemp/OutsideTemp telemetry → Fleet API climate_state.",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: "Invoking temperature.get on tescmd node",
-						},
-					],
-					details: { nodeMethod: "temperature.get", params: {} },
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("temperature.get", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_get_temperature" },
@@ -54,16 +57,18 @@ export function registerClimateTools(api: OpenClawPluginApi): void {
 				"Often paired with tescmd_set_climate_temp if the user specifies a target. " +
 				"\n\nWorkflow: tescmd_get_temperature → tescmd_climate_on → tescmd_set_climate_temp (optional).",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: "Invoking climate.on on tescmd node",
-						},
-					],
-					details: { nodeMethod: "climate.on", params: {} },
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("climate.on", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_climate_on" },
@@ -80,16 +85,18 @@ export function registerClimateTools(api: OpenClawPluginApi): void {
 				"Turn off the Tesla vehicle's climate control (HVAC). Stops " +
 				"auto-conditioning. Returns {result: true, reason: 'ok'} on success.",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: "Invoking climate.off on tescmd node",
-						},
-					],
-					details: { nodeMethod: "climate.off", params: {} },
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("climate.off", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_climate_off" },
@@ -115,18 +122,17 @@ export function registerClimateTools(api: OpenClawPluginApi): void {
 				}),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: `Invoking climate.set_temp with temp=${params.temp}°F on tescmd node`,
-						},
-					],
-					details: {
-						nodeMethod: "climate.set_temp",
-						params: { temp: params.temp },
-					},
-				};
+				try {
+					const result = await invokeTescmdNode("climate.set_temp", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_set_climate_temp" },

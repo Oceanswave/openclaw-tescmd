@@ -24,16 +24,18 @@ export function registerSecurityTools(api: OpenClawPluginApi): void {
 				"'vehicle status' overview, or before deciding whether to lock/enable sentry. " +
 				"\n\nData source: Locked/SentryMode telemetry → Fleet API vehicle_state.",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				const result = await invokeTescmdNode("security.get", {});
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: JSON.stringify(result, null, 2),
-						},
-					],
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("security.get", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_get_security" },
@@ -51,16 +53,18 @@ export function registerSecurityTools(api: OpenClawPluginApi): void {
 				"Security) command domain with signed commands when available. " +
 				"Auto-wakes the vehicle if asleep. Returns {result: true, reason: 'ok'}.",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				const result = await invokeTescmdNode("door.lock", {});
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: JSON.stringify(result, null, 2),
-						},
-					],
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("door.lock", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_lock_doors" },
@@ -81,16 +85,18 @@ export function registerSecurityTools(api: OpenClawPluginApi): void {
 				"unlocking. Never unlock proactively or as part of an automated workflow " +
 				"without explicit user confirmation.",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				const result = await invokeTescmdNode("door.unlock", {});
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: JSON.stringify(result, null, 2),
-						},
-					],
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("door.unlock", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_unlock_doors" },
@@ -108,16 +114,18 @@ export function registerSecurityTools(api: OpenClawPluginApi): void {
 				"locating the vehicle in a parking lot or signaling. " +
 				"Auto-wakes the vehicle if asleep.",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				const result = await invokeTescmdNode("flash_lights", {});
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: JSON.stringify(result, null, 2),
-						},
-					],
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("flash_lights", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_flash_lights" },
@@ -134,16 +142,18 @@ export function registerSecurityTools(api: OpenClawPluginApi): void {
 				"Honk the Tesla vehicle's horn briefly. Useful for locating " +
 				"the vehicle or alerting nearby people. Auto-wakes the vehicle if asleep.",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				const result = await invokeTescmdNode("honk_horn", {});
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: JSON.stringify(result, null, 2),
-						},
-					],
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("honk_horn", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_honk_horn" },
@@ -165,16 +175,18 @@ export function registerSecurityTools(api: OpenClawPluginApi): void {
 				"car has low charge. " +
 				"\n\nWorkflow: tescmd_lock_doors → tescmd_sentry_on → optionally tescmd_location_trigger (geofence).",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				const result = await invokeTescmdNode("sentry.on", {});
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: JSON.stringify(result, null, 2),
-						},
-					],
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("sentry.on", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_sentry_on" },
@@ -191,16 +203,18 @@ export function registerSecurityTools(api: OpenClawPluginApi): void {
 				"Disable Sentry Mode on the Tesla vehicle. Stops camera monitoring " +
 				"and reduces battery drain. Returns {result: true, reason: 'ok'}.",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				const result = await invokeTescmdNode("sentry.off", {});
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: JSON.stringify(result, null, 2),
-						},
-					],
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("sentry.off", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_sentry_off" },

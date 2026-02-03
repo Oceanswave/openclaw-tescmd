@@ -8,6 +8,7 @@
 
 import { Type } from "@sinclair/typebox";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
+import { invokeTescmdNode } from "./utils.js";
 
 export function registerNavigationTools(api: OpenClawPluginApi): void {
 	// -----------------------------------------------------------------
@@ -31,18 +32,17 @@ export function registerNavigationTools(api: OpenClawPluginApi): void {
 				}),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: `Sending destination: ${params.address}`,
-						},
-					],
-					details: {
-						nodeMethod: "nav.send",
-						params: { address: params.address },
-					},
-				};
+				try {
+					const result = await invokeTescmdNode("nav.send", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_nav_send" },
@@ -71,22 +71,17 @@ export function registerNavigationTools(api: OpenClawPluginApi): void {
 				),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: `Navigating to GPS: ${params.lat}, ${params.lon}`,
-						},
-					],
-					details: {
-						nodeMethod: "nav.gps",
-						params: {
-							lat: params.lat,
-							lon: params.lon,
-							...(params.order != null ? { order: params.order } : {}),
-						},
-					},
-				};
+				try {
+					const result = await invokeTescmdNode("nav.gps", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_nav_gps" },
@@ -107,16 +102,18 @@ export function registerNavigationTools(api: OpenClawPluginApi): void {
 				"or battery is low and no home charger is available. Pair with " +
 				"tescmd_get_battery to check if charging is actually needed first.",
 			parameters: Type.Object({}),
-			async execute(_toolCallId: string, _params: Record<string, unknown>) {
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: "Navigating to nearest Supercharger",
-						},
-					],
-					details: { nodeMethod: "nav.supercharger", params: {} },
-				};
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const result = await invokeTescmdNode("nav.supercharger", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_nav_supercharger" },
@@ -142,18 +139,17 @@ export function registerNavigationTools(api: OpenClawPluginApi): void {
 				}),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: `Sending waypoints: ${params.waypoints}`,
-						},
-					],
-					details: {
-						nodeMethod: "nav.waypoints",
-						params: { waypoints: params.waypoints },
-					},
-				};
+				try {
+					const result = await invokeTescmdNode("nav.waypoints", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_nav_waypoints" },
@@ -180,18 +176,17 @@ export function registerNavigationTools(api: OpenClawPluginApi): void {
 				lon: Type.Number({ description: "Vehicle's current longitude" }),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
-				return {
-					content: [
-						{
-							type: "text" as const,
-							text: "Triggering HomeLink",
-						},
-					],
-					details: {
-						nodeMethod: "homelink.trigger",
-						params: { lat: params.lat, lon: params.lon },
-					},
-				};
+				try {
+					const result = await invokeTescmdNode("homelink.trigger", params);
+					return {
+						content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
 			},
 		},
 		{ name: "tescmd_homelink" },

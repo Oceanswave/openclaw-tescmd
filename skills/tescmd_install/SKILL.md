@@ -2,7 +2,7 @@
 name: openclaw-tescmd
 slug: openclaw-tescmd
 displayName: OpenClaw Tesla (tescmd)
-version: 0.4.1
+version: 0.9.1
 description: Installation and setup guide for Tesla vehicle control and telemetry via the tescmd node.
 homepage: https://github.com/oceanswave/openclaw-tescmd
 metadata: {"category":"platform","platform":"tesla","node":"tescmd"}
@@ -12,7 +12,13 @@ metadata: {"category":"platform","platform":"tesla","node":"tescmd"}
 
 This plugin connects Tesla vehicles to the OpenClaw Gateway via the [tescmd](https://github.com/oceanswave/tescmd) node. Once installed and paired, the plugin automatically registers all tools, commands, slash commands, and telemetry event types.
 
-This document covers **installation and setup only**. Runtime tool usage, workflows, and error handling are provided by the plugin's registered tools (call `tescmd_help` for the full reference).
+This document covers **installation and setup only**. Runtime tool usage, workflows, and error handling are provided by the `tescmd` skill (call `tescmd_help` for the full reference).
+
+**What you get:**
+- 40 agent-callable tools
+- 14 slash commands
+- Real-time telemetry streaming
+- Supercharger discovery (10,000+ locations via supercharge.info)
 
 **Repositories:**
 - Plugin: https://github.com/oceanswave/openclaw-tescmd
@@ -123,10 +129,9 @@ openclaw plugins install @oceanswave/openclaw-tescmd
 
 ```bash
 openclaw plugins list
-openclaw tescmd status
 ```
 
-You should see the plugin listed and the status showing 34 whitelisted commands and 14 telemetry event types.
+You should see the plugin listed with version 0.9.0 (or later).
 
 #### Plugin management commands:
 
@@ -295,7 +300,7 @@ TESLA_COMMAND_PROTOCOL=auto        # auto, signed, or unsigned
 
 Once the node is running and paired, confirm it connected to the Gateway:
 ```bash
-openclaw tescmd status
+openclaw nodes status
 ```
 
 Or use the agent tool:
@@ -341,14 +346,6 @@ Minimal — the tescmd node handles all vehicle-specific configuration.
 ---
 
 ## CLI Quick Reference
-
-### OpenClaw Plugin Commands
-
-```bash
-openclaw tescmd status     # Plugin and node status
-openclaw tescmd commands   # List all 34 whitelisted commands
-openclaw tescmd events     # List telemetry event types
-```
 
 ### tescmd CLI Commands
 

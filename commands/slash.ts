@@ -274,7 +274,130 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 		},
 	});
 
+	api.registerCommand({
+		name: "nav",
+		description: "Send destination to vehicle navigation",
+		acceptsArgs: true,
+		requireAuth: true,
+		async handler(ctx) {
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+
+				const address = ctx.args?.trim();
+				if (!address) {
+					return { text: "❌ Usage: `/nav <address or place name>`\n\nExample: `/nav 1600 Amphitheatre Parkway, Mountain View, CA`" };
+				}
+
+				await invokeTescmdNode("nav.send", { address });
+				return { text: `🧭 Sent to navigation: **${address}**` };
+			} catch (err) {
+				return { text: `❌ Failed to send destination: ${err instanceof Error ? err.message : String(err)}` };
+			}
+		},
+	});
+
+	api.registerCommand({
+		name: "flash",
+		description: "Flash the vehicle headlights",
+		acceptsArgs: false,
+		requireAuth: true,
+		async handler(_ctx) {
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+				await invokeTescmdNode("flash_lights");
+				return { text: "💡 Headlights flashed!" };
+			} catch (err) {
+				return { text: `❌ Failed to flash lights: ${err instanceof Error ? err.message : String(err)}` };
+			}
+		},
+	});
+
+	api.registerCommand({
+		name: "honk",
+		description: "Honk the vehicle horn",
+		acceptsArgs: false,
+		requireAuth: true,
+		async handler(_ctx) {
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+				await invokeTescmdNode("honk_horn");
+				return { text: "📢 Horn honked!" };
+			} catch (err) {
+				return { text: `❌ Failed to honk: ${err instanceof Error ? err.message : String(err)}` };
+			}
+		},
+	});
+
+	api.registerCommand({
+		name: "trunk",
+		description: "Open/close the rear trunk",
+		acceptsArgs: false,
+		requireAuth: true,
+		async handler(_ctx) {
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+				await invokeTescmdNode("trunk.open");
+				return { text: "🚗 Trunk actuated!" };
+			} catch (err) {
+				return { text: `❌ Failed to actuate trunk: ${err instanceof Error ? err.message : String(err)}` };
+			}
+		},
+	});
+
+	api.registerCommand({
+		name: "frunk",
+		description: "Open the front trunk (frunk)",
+		acceptsArgs: false,
+		requireAuth: true,
+		async handler(_ctx) {
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+				await invokeTescmdNode("frunk.open");
+				return { text: "🚗 Frunk opened! (Must be closed manually)" };
+			} catch (err) {
+				return { text: `❌ Failed to open frunk: ${err instanceof Error ? err.message : String(err)}` };
+			}
+		},
+	});
+
+	api.registerCommand({
+		name: "homelink",
+		description: "Trigger HomeLink (garage door)",
+		acceptsArgs: false,
+		requireAuth: true,
+		async handler(_ctx) {
+			try {
+				const nodeId = await getTescmdNodeId();
+				if (!nodeId) {
+					return { text: "❌ No Tesla node connected. Start tescmd to use vehicle commands." };
+				}
+
+				// Get current location first
+				const location = await invokeTescmdNode<{ latitude: number; longitude: number }>("location.get");
+				await invokeTescmdNode("homelink.trigger", { lat: location.latitude, lon: location.longitude });
+				return { text: "🏠 HomeLink triggered!" };
+			} catch (err) {
+				return { text: `❌ Failed to trigger HomeLink: ${err instanceof Error ? err.message : String(err)}` };
+			}
+		},
+	});
+
 	api.logger.info(
-		"Registered 8 slash commands: /battery /charge /climate /lock /unlock /sentry /location /vehicle",
+		"Registered 14 slash commands: /battery /charge /climate /lock /unlock /sentry /location /vehicle /nav /flash /honk /trunk /frunk /homelink",
 	);
 }

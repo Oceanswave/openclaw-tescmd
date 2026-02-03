@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error - openclaw internals not typed
 import { callGatewayTool } from "openclaw/dist/agents/tools/gateway.js";
 
 type NodeInfo = {
@@ -21,9 +21,7 @@ export async function getTescmdNodeId(refresh = false): Promise<string | null> {
 		// Empty options object uses default gateway URL from environment/config
 		const response = await callGatewayTool<NodeListResponse>("node.list", {});
 		// Look for platform="tesla"
-		const node = response.nodes.find(
-			(n: NodeInfo) => n.platform === "tesla" && n.connected,
-		);
+		const node = response.nodes.find((n: NodeInfo) => n.platform === "tesla" && n.connected);
 		if (node) {
 			cachedNodeId = node.id;
 			return node.id;
@@ -40,9 +38,7 @@ export async function invokeTescmdNode<T = unknown>(
 ): Promise<T> {
 	const nodeId = await getTescmdNodeId();
 	if (!nodeId) {
-		throw new Error(
-			"No connected Tesla (tescmd) node found. Please start a tescmd node.",
-		);
+		throw new Error("No connected Tesla (tescmd) node found. Please start a tescmd node.");
 	}
 
 	try {

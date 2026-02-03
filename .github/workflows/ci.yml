@@ -23,7 +23,7 @@ jobs:
 
       - uses: biomejs/setup-biome@v2
         with:
-          version: "2.3.8"
+          version: "2.3.13"
 
       - name: Lint and format
         run: biome ci .

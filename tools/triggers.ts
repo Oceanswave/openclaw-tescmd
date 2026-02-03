@@ -18,6 +18,7 @@
 import { Type } from "@sinclair/typebox";
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
 import { stringEnum } from "openclaw/plugin-sdk";
+import { invokeTescmdNode } from "./utils.js";
 
 const TRIGGER_OPERATORS = [
 	"lt",
@@ -61,9 +62,9 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 				"is met. Use trigger IDs from this list with tescmd_delete_trigger.",
 			parameters: Type.Object({}),
 			async execute(_toolCallId: string, _params: Record<string, unknown>) {
+				const result = await invokeTescmdNode("trigger.list", {});
 				return {
-					content: [{ type: "text" as const, text: "Invoking trigger.list on tescmd node" }],
-					details: { nodeMethod: "trigger.list", params: {} },
+					content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
 				};
 			},
 		},
@@ -85,9 +86,9 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 				"will return empty unless new triggers have fired.",
 			parameters: Type.Object({}),
 			async execute(_toolCallId: string, _params: Record<string, unknown>) {
+				const result = await invokeTescmdNode("trigger.poll", {});
 				return {
-					content: [{ type: "text" as const, text: "Invoking trigger.poll on tescmd node" }],
-					details: { nodeMethod: "trigger.poll", params: {} },
+					content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
 				};
 			},
 		},
@@ -126,14 +127,14 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 				),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				const result = await invokeTescmdNode("trigger.create", params);
 				return {
 					content: [
 						{
 							type: "text" as const,
-							text: `Creating trigger: ${params.field} ${params.operator} ${params.value ?? "(any change)"}`,
+							text: JSON.stringify(result, null, 2),
 						},
 					],
-					details: { nodeMethod: "trigger.create", params },
 				};
 			},
 		},
@@ -154,14 +155,14 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 				id: Type.String({ description: "The trigger ID to delete" }),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				const result = await invokeTescmdNode("trigger.delete", { id: params.id });
 				return {
 					content: [
 						{
 							type: "text" as const,
-							text: `Deleting trigger ${params.id}`,
+							text: JSON.stringify(result, null, 2),
 						},
 					],
-					details: { nodeMethod: "trigger.delete", params: { id: params.id } },
 				};
 			},
 		},
@@ -190,14 +191,14 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 				),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				const result = await invokeTescmdNode("cabin_temp.trigger", params);
 				return {
 					content: [
 						{
 							type: "text" as const,
-							text: `Creating cabin temp trigger: InsideTemp ${params.operator} ${params.value ?? "(any)"}`,
+							text: JSON.stringify(result, null, 2),
 						},
 					],
-					details: { nodeMethod: "cabin_temp.trigger", params },
 				};
 			},
 		},
@@ -221,14 +222,14 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 				),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				const result = await invokeTescmdNode("outside_temp.trigger", params);
 				return {
 					content: [
 						{
 							type: "text" as const,
-							text: `Creating outside temp trigger: OutsideTemp ${params.operator} ${params.value ?? "(any)"}`,
+							text: JSON.stringify(result, null, 2),
 						},
 					],
-					details: { nodeMethod: "outside_temp.trigger", params },
 				};
 			},
 		},
@@ -253,14 +254,14 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 				),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				const result = await invokeTescmdNode("battery.trigger", params);
 				return {
 					content: [
 						{
 							type: "text" as const,
-							text: `Creating battery trigger: BatteryLevel ${params.operator} ${params.value ?? "(any)"}`,
+							text: JSON.stringify(result, null, 2),
 						},
 					],
-					details: { nodeMethod: "battery.trigger", params },
 				};
 			},
 		},
@@ -293,14 +294,14 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 				),
 			}),
 			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				const result = await invokeTescmdNode("location.trigger", params);
 				return {
 					content: [
 						{
 							type: "text" as const,
-							text: `Creating location trigger: geofence ${params.operator}`,
+							text: JSON.stringify(result, null, 2),
 						},
 					],
-					details: { nodeMethod: "location.trigger", params },
 				};
 			},
 		},

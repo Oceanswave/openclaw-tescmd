@@ -60,7 +60,7 @@ These aren't scripted — they're natural language requests your agent can fulfi
 | Request | Tools Involved |
 |---------|---------------|
 | "Navigate to my 2pm meeting" | Calendar → Places → `tescmd_nav_send` |
-| "Road trip to Asheville, find Superchargers" | Places → `tescmd_superchargers_route` → `tescmd_nav_waypoints` |
+| "Road trip to Asheville, find Superchargers" | goplaces → `tescmd_superchargers_route` → agent picks stops |
 | "Is there a Supercharger near the restaurant?" | `tescmd_superchargers_near` (with restaurant coords) |
 | "Let me know when I'm charged enough to get home" | `tescmd_get_location` → distance calc → `tescmd_battery_trigger` |
 | "Prep the car, I'm heading out" | `tescmd_climate_on` → `tescmd_unlock_doors` |

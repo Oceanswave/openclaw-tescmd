@@ -1,6 +1,7 @@
 {
 	"id": "openclaw-tescmd",
 	"kind": "platform",
+	"skills": ["skills/tescmd", "skills/tescmd_install"],
 	"configSchema": {
 		"type": "object",
 		"properties": {

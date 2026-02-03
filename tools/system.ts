@@ -40,7 +40,7 @@ export function registerSystemTools(api: OpenClawPluginApi): void {
 					description: "Command method name — dot-notation (door.lock) or snake_case (door_lock)",
 				}),
 				params: Type.Optional(
-					Type.Record(Type.String(), Type.Unknown(), {
+					Type.Record(Type.String(), Type.Object({}), {
 						description: "Optional parameters to pass to the command",
 					}),
 				),

@@ -110,11 +110,9 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 			parameters: Type.Object({
 				field: stringEnum(TRIGGER_FIELDS),
 				operator: stringEnum(TRIGGER_OPERATORS),
-				value: Type.Optional(
-					Type.Union([Type.Number(), Type.String(), Type.Boolean()], {
-						description: "Threshold value for the condition",
-					}),
-				),
+				value: Type.Any({
+					description: "Threshold value for the condition",
+				}),
 				once: Type.Optional(
 					Type.Boolean({
 						description: "If true, the trigger fires only once then auto-deletes (default: false)",
@@ -287,7 +285,7 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 					Type.Number({ description: "Geofence radius in meters", minimum: 0 }),
 				),
 				value: Type.Optional(
-					Type.Unknown({ description: "Alternative: pass {lat, lon, radius} as value object" }),
+					Type.Object({}, { description: "Alternative: pass {lat, lon, radius} as value object" }),
 				),
 				once: Type.Optional(Type.Boolean({ description: "Fire only once (default: false)" })),
 				cooldown_seconds: Type.Optional(

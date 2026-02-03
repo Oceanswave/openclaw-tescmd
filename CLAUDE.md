@@ -24,7 +24,6 @@ This plugin is the **Gateway-side counterpart** to the tescmd node. It defines t
 | `telemetry.ts` | Defines the 14 telemetry event types and their TypeScript interfaces |
 | `tools/` | One file per tool domain: `vehicle`, `charge`, `climate`, `security`, `trunk`, `navigation`, `triggers`, `system`, `status`, `capabilities` |
 | `commands/slash.ts` | 8 slash commands (`/battery`, `/charge`, `/climate`, etc.) |
-| `commands/cli.ts` | CLI subcommands (`openclaw tescmd status/commands/events`) |
 | `types/openclaw.d.ts` | Type declarations for the `openclaw/plugin-sdk` peer dependency |
 | `openclaw.plugin.json` | Plugin manifest — declares `id`, `kind: "platform"`, and `configSchema` |
 | `skill.md` | **Agent handbook** — comprehensive reference document shipped in the npm package. OpenClaw loads this as a skill so agents can look up tool usage, workflows, setup instructions, error handling, and telemetry field mappings. This is NOT a developer doc — it's written for AI agents. |

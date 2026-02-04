@@ -97,7 +97,7 @@ Built-in integration with [supercharge.info](https://supercharge.info) — a com
 
 Returns stall count, power level (kW), status, and distance — everything you need to plan charging stops.
 
-### 14 Slash Commands
+### 15 Slash Commands
 
 Quick actions when you don't need the full agent:
 
@@ -114,6 +114,7 @@ Quick actions when you don't need the full agent:
 | `/flash` `/honk` | Find your car |
 | `/trunk` `/frunk` | Trunk control |
 | `/homelink` | Garage door |
+| `/supercharger [city]` | Find Superchargers |
 
 ### Real-Time Telemetry
 

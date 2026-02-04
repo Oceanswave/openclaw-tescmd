@@ -2,7 +2,7 @@
 name: openclaw-tescmd
 slug: openclaw-tescmd
 displayName: OpenClaw Tesla (tescmd)
-version: 0.9.1
+version: 0.9.4
 description: Installation and setup guide for Tesla vehicle control and telemetry via the tescmd node.
 homepage: https://github.com/oceanswave/openclaw-tescmd
 metadata: {"category":"platform","platform":"tesla","node":"tescmd"}
@@ -15,10 +15,11 @@ This plugin connects Tesla vehicles to the OpenClaw Gateway via the [tescmd](htt
 This document covers **installation and setup only**. Runtime tool usage, workflows, and error handling are provided by the `tescmd` skill (call `tescmd_help` for the full reference).
 
 **What you get:**
-- 40 agent-callable tools
+- 39 agent-callable tools
 - 14 slash commands
 - Real-time telemetry streaming
 - Supercharger discovery (10,000+ locations via supercharge.info)
+- CLI fallback when node is disconnected
 
 **Repositories:**
 - Plugin: https://github.com/oceanswave/openclaw-tescmd

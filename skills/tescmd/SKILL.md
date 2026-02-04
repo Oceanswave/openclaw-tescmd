@@ -14,7 +14,8 @@ Control and monitor Tesla vehicles through the OpenClaw Gateway. This skill cove
 
 ## Prerequisites
 
-- tescmd node running and connected to the Gateway
+- tescmd node running and connected to the Gateway (preferred), OR
+- tescmd CLI installed locally (fallback mode)
 - Vehicle paired and authenticated
 
 **Version Note:** The plugin and tescmd node versions are **independent** — they do not need to match. The plugin provides agent tools that invoke commands on whatever node version is connected.
@@ -25,6 +26,8 @@ openclaw nodes status
 ```
 
 Or use the agent tool: `tescmd_node_status`
+
+**CLI Fallback**: If no node is connected but the `tescmd` CLI is installed, basic commands (lock, unlock, climate, charge, honk, flash) and data queries (battery, temperature, location) will fall back to CLI execution. Response includes `{ fallback: true }` when CLI is used.
 
 ---
 

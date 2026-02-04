@@ -110,59 +110,6 @@ export function registerTriggerTools(api: OpenClawPluginApi): void {
 	);
 
 	// -----------------------------------------------------------------
-	// tescmd_create_trigger
-	// -----------------------------------------------------------------
-	api.registerTool(
-		{
-			name: "tescmd_create_trigger",
-			label: "Create Trigger",
-			description:
-				"Create a new telemetry trigger subscription. The trigger fires when " +
-				"the specified telemetry field meets the condition (operator + value). " +
-				"For example: field='Soc', operator='lt', value=20 fires when battery " +
-				"drops below 20%. For geofence: field='Location', operator='leave', " +
-				"with lat/lon/radius in value. Returns {id, field, operator} on success.",
-			parameters: Type.Object({
-				field: stringEnum(TRIGGER_FIELDS),
-				operator: stringEnum(TRIGGER_OPERATORS),
-				value: Type.Any({
-					description: "Threshold value for the condition",
-				}),
-				once: Type.Optional(
-					Type.Boolean({
-						description: "If true, the trigger fires only once then auto-deletes (default: false)",
-					}),
-				),
-				cooldown_seconds: Type.Optional(
-					Type.Number({
-						description: "Minimum seconds between consecutive fires for this trigger (default: 60)",
-						minimum: 0,
-					}),
-				),
-			}),
-			async execute(_toolCallId: string, params: Record<string, unknown>) {
-				try {
-					const result = await invokeTescmdNode("trigger.create", params);
-					return {
-						content: [
-							{
-								type: "text" as const,
-								text: JSON.stringify(result, null, 2),
-							},
-						],
-					};
-				} catch (err) {
-					return {
-						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
-						isError: true,
-					};
-				}
-			},
-		},
-		{ name: "tescmd_create_trigger" },
-	);
-
-	// -----------------------------------------------------------------
 	// tescmd_delete_trigger
 	// -----------------------------------------------------------------
 	api.registerTool(

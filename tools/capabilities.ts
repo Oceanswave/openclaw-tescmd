@@ -63,9 +63,8 @@ You have access to a Tesla vehicle through the tescmd node. Here's what you can 
 | tescmd_delete_trigger | Remove a trigger that's no longer needed |
 
 ### Advanced
-| Tool | Use When... |
-|------|------------|
-| tescmd_run_command | You need a command not covered by a dedicated tool, or the method name is dynamic |
+
+All dedicated tools are listed above. For commands not covered, check the tescmd CLI reference or contact the plugin maintainer.
 
 ## Common Workflows
 
@@ -146,7 +145,7 @@ Tesla's API has rate limits (429 responses). tescmd caches read responses to min
 If a write command fails:
 - Check if the vehicle is in a valid state (e.g., charge cable connected for charge.start)
 - Check if the vehicle is online (tescmd_get_speed returns non-null when driving)
-- Try tescmd_run_command as a fallback — it accepts both dot-notation and Fleet API names
+- Retry the specific tool — the node handles Fleet API method translation internally
 
 ### Common Error Patterns
 | Error | Cause | Resolution |

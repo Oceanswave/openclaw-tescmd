@@ -1,36 +1,37 @@
 /**
  * OpenClaw plugin: openclaw-tescmd
  *
- * Registers the Tesla vehicle platform with the OpenClaw Gateway,
- * whitelists all 34 tescmd node commands, and exposes 37 richly-documented
- * agent-callable tools for vehicle control and telemetry monitoring.
+ * Exposes richly-documented agent-callable tools for Tesla vehicle control,
+ * telemetry monitoring, and Supercharger discovery via supercharge.info API.
+ *
+ * NOTE: The plugin version and tescmd node version are INDEPENDENT.
+ * They do not need to match. The plugin provides agent tools that
+ * invoke commands on whatever node version is connected.
  *
  * The tescmd node (https://github.com/oceanswave/tescmd) connects to the
- * Tesla Fleet API and streams real-time telemetry data.  This plugin
+ * Tesla Fleet API and streams real-time telemetry data. This plugin
  * (https://github.com/oceanswave/openclaw-tescmd) is the Gateway-side
  * counterpart that enables agents to discover and invoke Tesla vehicle
  * commands through the OpenClaw tool system.
  *
  * Architecture:
- *   Agent → OpenClaw Gateway → [this plugin routes to] → tescmd node → Tesla Fleet API → Vehicle
+ *   Agent → OpenClaw Gateway → [this plugin] → system.run → tescmd node → Tesla Fleet API → Vehicle
  *
- * Tool categories (37 tools):
- *   - Help (1):       capabilities reference and workflow guide (tescmd_help)
- *   - Status (1):     node connection health check (tescmd_node_status)
- *   - Vehicle (3):    location, battery, speed
- *   - Charge (4):     charge state, start/stop/limit
- *   - Climate (4):    temperature, HVAC on/off, set temp
- *   - Security (7):   lock state, lock/unlock, flash, honk, sentry on/off
- *   - Trunk (2):      trunk, frunk
- *   - Navigation (5): send destination, GPS, supercharger, waypoints, homelink
- *   - Triggers (8):   list, poll, create, delete, + 4 convenience aliases
- *   - System (1):     meta-dispatch (system.run)
+ * Tool categories (39 tools):
+ *   - Help (1):          capabilities reference and workflow guide (tescmd_help)
+ *   - Status (1):        node connection health check (tescmd_node_status)
+ *   - Vehicle (3):       location, battery, speed
+ *   - Charge (4):        charge state, start/stop/limit
+ *   - Climate (4):       temperature, HVAC on/off, set temp
+ *   - Security (7):      lock state, lock/unlock, flash, honk, sentry on/off
+ *   - Trunk (2):         trunk, frunk
+ *   - Navigation (5):    send destination, GPS, supercharger, waypoints, homelink
+ *   - Superchargers (3): find nearby, along route, search by name
+ *   - Triggers (8):      list, poll, create, delete, + 4 convenience aliases
  *
- * Slash commands (8):
- *   /battery, /charge, /climate, /lock, /unlock, /sentry, /location, /vehicle
- *
- * CLI subcommands:
- *   openclaw tescmd status | commands | events
+ * Slash commands (14):
+ *   /battery, /charge, /climate, /lock, /unlock, /sentry, /location, /vehicle,
+ *   /nav, /flash, /honk, /trunk, /frunk, /homelink
  */
 
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
@@ -42,7 +43,7 @@ import { registerClimateTools } from "./tools/climate.js";
 import { registerNavigationTools } from "./tools/navigation.js";
 import { registerSecurityTools } from "./tools/security.js";
 import { registerStatusTool } from "./tools/status.js";
-import { registerSystemTools } from "./tools/system.js";
+import { registerSuperchargerTools } from "./tools/superchargers.js";
 import { registerTriggerTools } from "./tools/triggers.js";
 import { registerTrunkTools } from "./tools/trunk.js";
 import { registerVehicleTools } from "./tools/vehicle.js";
@@ -52,10 +53,9 @@ export default {
 	name: "Tesla (tescmd)",
 	description:
 		"Tesla vehicle control and real-time telemetry via the tescmd node. " +
-		"Provides 37 agent-callable tools for vehicle status, charging, climate, " +
+		"Provides 39 agent-callable tools for vehicle status, charging, climate, " +
 		"security, trunk access, navigation, sentry mode, and trigger subscriptions. " +
-		"Streams telemetry events including GPS location, battery level, " +
-		"temperature, speed, charge state, and security changes.",
+		"Plugin and node versions are independent — they do not need to match.",
 	kind: "platform" as const,
 	configSchema: tescmdConfigSchema,
 
@@ -76,26 +76,9 @@ export default {
 		registerTrunkTools(api);
 		registerNavigationTools(api);
 		registerTriggerTools(api);
-		registerSystemTools(api);
+		registerSuperchargerTools(api);
 
 		// Register slash commands
 		registerSlashCommands(api);
-
-		// Register a service for lifecycle logging
-		api.registerService({
-			id: "tescmd-platform",
-			start() {
-				api.logger.info(
-					"openclaw-tescmd platform plugin active — " +
-						"34 commands whitelisted, 37 tools registered, " +
-						"8 slash commands, 3 CLI subcommands",
-				);
-			},
-			stop() {
-				api.logger.info("openclaw-tescmd platform plugin stopping");
-			},
-		});
-
-		api.logger.info("openclaw-tescmd plugin registered successfully");
 	},
 };

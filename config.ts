@@ -7,10 +7,12 @@
 
 export interface TescmdConfig {
 	debug: boolean;
+	triggerPollIntervalMs: number;
 }
 
 const DEFAULT_CONFIG: TescmdConfig = {
 	debug: false,
+	triggerPollIntervalMs: 30000,
 };
 
 /**
@@ -27,6 +29,10 @@ export function parseConfig(raw: unknown): TescmdConfig {
 
 	return {
 		debug: typeof obj.debug === "boolean" ? obj.debug : DEFAULT_CONFIG.debug,
+		triggerPollIntervalMs:
+			typeof obj.triggerPollIntervalMs === "number"
+				? obj.triggerPollIntervalMs
+				: DEFAULT_CONFIG.triggerPollIntervalMs,
 	};
 }
 

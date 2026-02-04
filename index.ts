@@ -29,7 +29,7 @@
  *   - Superchargers (3): find nearby, along route, search by name
  *   - Triggers (8):      list, poll, create, delete, + 4 convenience aliases
  *
- * Slash commands (15):
+ * Slash commands (14):
  *   /battery, /charge, /climate, /lock, /unlock, /sentry, /location, /vehicle,
  *   /nav, /flash, /honk, /trunk, /frunk, /homelink
  */
@@ -37,6 +37,7 @@
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
 import { registerSlashCommands } from "./commands/slash.js";
 import { type TescmdConfig, tescmdConfigSchema } from "./config.js";
+import { createTriggerMonitorService } from "./services/trigger-monitor.js";
 import { registerCapabilitiesTool } from "./tools/capabilities.js";
 import { registerChargeTools } from "./tools/charge.js";
 import { registerClimateTools } from "./tools/climate.js";
@@ -65,6 +66,10 @@ export default {
 		if (config.debug) {
 			api.logger.info("openclaw-tescmd: debug mode enabled");
 		}
+
+		// Register background services
+		// @ts-ignore - Type definition mismatch for OpenClawPluginService in SDK
+		api.registerService(createTriggerMonitorService(config) as any);
 
 		// Register all agent-callable tools by domain
 		registerCapabilitiesTool(api);

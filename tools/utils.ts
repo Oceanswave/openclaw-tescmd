@@ -22,23 +22,47 @@ type ToolsInvokeResponse = {
 
 let cachedNodeId: string | null = null;
 let cachedToken: string | null = null;
+let cachedGatewayHost: string | null = null;
+let cachedGatewayPort: string | null = null;
+
+function loadConfigValues(): void {
+	if (cachedToken !== null) return; // Already loaded
+
+	// Try env vars first
+	cachedToken = process.env.OPENCLAW_GATEWAY_TOKEN || "";
+	cachedGatewayPort = process.env.OPENCLAW_GATEWAY_PORT || "";
+	cachedGatewayHost = process.env.OPENCLAW_GATEWAY_HOST || "";
+
+	// Load from config file if not set
+	try {
+		const configPath = path.join(os.homedir(), ".openclaw", "openclaw.json");
+		const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+		if (!cachedToken) {
+			cachedToken = config.gateway?.auth?.token || config.gateway?.token || "";
+		}
+		if (!cachedGatewayPort) {
+			cachedGatewayPort = String(config.gateway?.port || 18789);
+		}
+		if (!cachedGatewayHost) {
+			// "loopback" means 127.0.0.1, otherwise use the bind address
+			const bind = config.gateway?.bind || "loopback";
+			cachedGatewayHost = bind === "loopback" ? "127.0.0.1" : bind;
+		}
+	} catch {
+		// Fallback to defaults
+		if (!cachedGatewayPort) cachedGatewayPort = "18789";
+		if (!cachedGatewayHost) cachedGatewayHost = "127.0.0.1";
+	}
+}
 
 function getToken(): string {
-	if (cachedToken !== null) return cachedToken;
+	loadConfigValues();
+	return cachedToken || "";
+}
 
-	// Try env var first
-	let token = process.env.OPENCLAW_GATEWAY_TOKEN || "";
-	if (!token) {
-		try {
-			const configPath = path.join(os.homedir(), ".openclaw", "openclaw.json");
-			const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-			token = config.gateway?.token || "";
-		} catch {
-			// ignore
-		}
-	}
-	cachedToken = token;
-	return token;
+function getGatewayUrl(): string {
+	loadConfigValues();
+	return `http://${cachedGatewayHost}:${cachedGatewayPort}`;
 }
 
 // Use fetch to call the gateway's /tools/invoke HTTP endpoint
@@ -47,12 +71,12 @@ async function callTool<T>(
 	action: string,
 	args: Record<string, unknown>,
 ): Promise<T> {
-	const port = process.env.OPENCLAW_GATEWAY_PORT || "18789";
+	const gatewayUrl = getGatewayUrl();
 	const token = getToken();
 
 	const body = { tool: toolName, action, args };
 
-	const response = await fetch(`http://127.0.0.1:${port}/tools/invoke`, {
+	const response = await fetch(`${gatewayUrl}/tools/invoke`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
@@ -98,8 +122,8 @@ export async function getTescmdNodeId(refresh = false): Promise<string | null> {
 			cachedNodeId = node.nodeId;
 			return node.nodeId;
 		}
-	} catch (err) {
-		console.error("Failed to list nodes:", err);
+	} catch {
+		// Node discovery failed silently — return null
 	}
 	return null;
 }
@@ -114,12 +138,19 @@ export async function invokeTescmdNode<T = unknown>(
 	}
 
 	try {
-		// Use nodes action=run which invokes system.run on the node
-		const command = Object.keys(params).length > 0 ? [method, JSON.stringify(params)] : [method];
+		// Use nodes action=invoke to call system.run on the node.
+		// system.run is the meta-dispatch that routes to all commands.
+		// Format: invokeParamsJson = { method: "nav.send", params: { address: "..." } }
+		const invokeParams = JSON.stringify({
+			method,
+			params,
+		});
 
-		return await callTool<T>("nodes", "run", {
+		return await callTool<T>("nodes", "invoke", {
 			node: nodeId,
-			command,
+			invokeCommand: "system.run",
+			invokeParamsJson: invokeParams,
+			timeoutMs: 30000,
 		});
 	} catch (err) {
 		// If ID is stale, retry once
@@ -130,11 +161,15 @@ export async function invokeTescmdNode<T = unknown>(
 			cachedNodeId = null;
 			const newNodeId = await getTescmdNodeId(true);
 			if (newNodeId) {
-				const command =
-					Object.keys(params).length > 0 ? [method, JSON.stringify(params)] : [method];
-				return await callTool<T>("nodes", "run", {
+				const invokeParams = JSON.stringify({
+					method,
+					params,
+				});
+				return await callTool<T>("nodes", "invoke", {
 					node: newNodeId,
-					command,
+					invokeCommand: "system.run",
+					invokeParamsJson: invokeParams,
+					timeoutMs: 30000,
 				});
 			}
 		}

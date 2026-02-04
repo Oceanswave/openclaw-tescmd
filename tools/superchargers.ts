@@ -354,8 +354,4 @@ export function registerSuperchargerTools(api: OpenClawPluginApi) {
 		},
 		{ name: "tescmd_superchargers_search" },
 	);
-
-	api.logger.info(
-		"Registered 3 Supercharger tools: tescmd_superchargers_near, tescmd_superchargers_route, tescmd_superchargers_search",
-	);
 }

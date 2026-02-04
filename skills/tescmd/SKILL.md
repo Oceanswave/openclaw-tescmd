@@ -2,7 +2,7 @@
 name: tescmd
 slug: tescmd
 displayName: Tesla Vehicle Control
-version: 0.9.1
+version: 0.9.6
 description: Control and monitor Tesla vehicles via the tescmd node. Get battery, climate, location, lock/unlock doors, start/stop charging, find Superchargers, and more.
 homepage: https://github.com/oceanswave/openclaw-tescmd
 metadata: {"category":"platform","platform":"tesla","node":"tescmd"}

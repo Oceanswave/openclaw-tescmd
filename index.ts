@@ -29,7 +29,7 @@
  *   - Superchargers (3): find nearby, along route, search by name
  *   - Triggers (8):      list, poll, create, delete, + 4 convenience aliases
  *
- * Slash commands (14):
+ * Slash commands (15):
  *   /battery, /charge, /climate, /lock, /unlock, /sentry, /location, /vehicle,
  *   /nav, /flash, /honk, /trunk, /frunk, /homelink
  */

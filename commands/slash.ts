@@ -437,7 +437,79 @@ export function registerSlashCommands(api: OpenClawPluginApi): void {
 		},
 	});
 
-	api.logger.info(
-		"Registered 14 slash commands: /battery /charge /climate /lock /unlock /sentry /location /vehicle /nav /flash /honk /trunk /frunk /homelink",
-	);
+	// Supercharger commands
+	api.registerCommand({
+		name: "supercharger",
+		description: "Find nearby Superchargers. Usage: /supercharger [city or 'near me']",
+		acceptsArgs: true,
+		requireAuth: false,
+		async handler(ctx) {
+			try {
+				const query = ctx.args?.trim() || "";
+
+				if (!query || query.toLowerCase() === "near me") {
+					// Try to get vehicle location
+					const nodeId = await getTescmdNodeId();
+					if (nodeId) {
+						try {
+							const location = await invokeTescmdNode<{ latitude: number; longitude: number }>(
+								"location.get",
+							);
+							const result = await invokeTescmdNode<{
+								superchargers: Array<{
+									name: string;
+									city: string;
+									state: string;
+									distance_miles: number;
+									stalls: number;
+								}>;
+							}>("supercharger.near", {
+								latitude: location.latitude,
+								longitude: location.longitude,
+								limit: 5,
+							});
+
+							if (!result.superchargers?.length) {
+								return { text: "⚡ No Superchargers found nearby." };
+							}
+
+							const lines = result.superchargers.map(
+								(sc) =>
+									`• **${sc.name}** (${sc.city}, ${sc.state}) — ${sc.distance_miles.toFixed(1)} mi, ${sc.stalls} stalls`,
+							);
+							return { text: `⚡ **Nearby Superchargers:**\n${lines.join("\n")}` };
+						} catch {
+							// Fall through to search
+						}
+					}
+					return { text: "❌ Provide a city name: `/supercharger Richmond VA`" };
+				}
+
+				// Search by query
+				const result = await invokeTescmdNode<{
+					superchargers: Array<{
+						name: string;
+						city: string;
+						state: string;
+						stalls: number;
+						power_kw: number;
+					}>;
+				}>("supercharger.search", { query, limit: 5 });
+
+				if (!result.superchargers?.length) {
+					return { text: `⚡ No Superchargers found matching "${query}".` };
+				}
+
+				const lines = result.superchargers.map(
+					(sc) =>
+						`• **${sc.name}** (${sc.city}, ${sc.state}) — ${sc.stalls} stalls, ${sc.power_kw}kW`,
+				);
+				return { text: `⚡ **Superchargers matching "${query}":**\n${lines.join("\n")}` };
+			} catch (err) {
+				return {
+					text: `❌ Failed to find Superchargers: ${err instanceof Error ? err.message : String(err)}`,
+				};
+			}
+		},
+	});
 }

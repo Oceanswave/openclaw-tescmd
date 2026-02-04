@@ -2,7 +2,7 @@
 name: tescmd
 slug: tescmd
 displayName: Tesla Vehicle Control
-version: 0.9.1
+version: 0.9.4
 description: Control and monitor Tesla vehicles via the tescmd node. Get battery, climate, location, lock/unlock doors, start/stop charging, find Superchargers, and more.
 homepage: https://github.com/oceanswave/openclaw-tescmd
 metadata: {"category":"platform","platform":"tesla","node":"tescmd"}
@@ -14,8 +14,8 @@ Control and monitor Tesla vehicles through the OpenClaw Gateway. This skill cove
 
 ## Prerequisites
 
-- tescmd node running and connected to the Gateway
-- Vehicle paired and authenticated
+- tescmd node running and connected to the Gateway (preferred), OR
+- tescmd CLI installed locally (fallback mode)
 
 Verify connection:
 ```bash
@@ -23,6 +23,8 @@ openclaw nodes status
 ```
 
 Or use the agent tool: `tescmd_node_status`
+
+**CLI Fallback**: If no node is connected but the `tescmd` CLI is installed, basic commands (lock, unlock, climate, charge, honk, flash) and data queries (battery, temperature, location) will fall back to CLI execution. Response includes `{ fallback: true }` when CLI is used.
 
 ---
 

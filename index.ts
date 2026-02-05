@@ -64,6 +64,7 @@ export default {
 		const config = tescmdConfigSchema.parse(api.pluginConfig) as TescmdConfig;
 
 		// Store runtime for use by utility modules
+		// biome-ignore lint/suspicious/noExplicitAny: runtime type varies by OpenClaw version
 		setTescmdRuntime(api.runtime as any);
 
 		if (config.debug) {
@@ -72,8 +73,8 @@ export default {
 
 		// Register gateway method for tescmd.trigger.fired events pushed from tescmd node (v0.6.0+)
 		// The node sends: { method: "tescmd.trigger.fired", params: { trigger_id, field, operator, value, vin, ... } }
-		api.registerGatewayMethod("tescmd.trigger.fired", ({ params, respond }: { params: any; respond: (ok: boolean, payload?: any, error?: any) => void }) => {
-			const { trigger_id, field, operator, value, vin, threshold } = params;
+		api.registerGatewayMethod("tescmd.trigger.fired", ({ params, respond }: { params: Record<string, unknown>; respond: (ok: boolean, payload?: unknown, error?: unknown) => void }) => {
+			const { trigger_id, field, operator, value, vin, threshold } = params as { trigger_id: string; field: string; operator?: string; value: unknown; vin?: string; threshold?: unknown };
 			const text = `🌡️ Tesla trigger fired: ${field} ${operator || ""} ${threshold || ""} (current: ${value})${vin ? ` [${vin.slice(-4)}]` : ""}`;
 		
 			// Use runtime.system.enqueueSystemEvent to inject into agent session
@@ -89,8 +90,8 @@ export default {
 		});
 
 		// Register gateway method for generic req:agent events (lifecycle, telemetry, etc.)
-		api.registerGatewayMethod("req:agent", ({ params, respond }: { params: any; respond: (ok: boolean, payload?: any, error?: any) => void }) => {
-			const eventType = params?.event_type;
+		api.registerGatewayMethod("req:agent", ({ params, respond }: { params: Record<string, unknown>; respond: (ok: boolean, payload?: unknown, error?: unknown) => void }) => {
+			const eventType = (params as { event_type?: string })?.event_type;
 			api.logger.debug(`req:agent event received: ${eventType}`);
 			respond(true, { received: true, event_type: eventType });
 		});

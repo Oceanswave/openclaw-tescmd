@@ -59,6 +59,8 @@ Sure. The Fleet API is well-documented. A pure TypeScript implementation is poss
 
 But the current setup works. It's been battle-tested. Why fix what isn't broken?
 
+If this gains traction, we can always point some tokens at it. 🤖
+
 ---
 
 ## TL;DR

@@ -24,13 +24,9 @@ By the time we understood `registerGatewayMethod()`, typed tool schemas, and the
 
 Rewriting a working system? That's how you introduce bugs.
 
-### 2. Python Had the Libraries
+### 2. Python Was Familiar
 
-The Tesla ecosystem tilts toward Python and Go:
-- `tesla_fleet_api` — Python
-- `vehicle-command` — Go
-
-When tescmd was built, these were the mature options. Going with Python made sense at the time.
+The official Tesla `vehicle-command` library is in Go. But Python was already in the toolbox, and third-party libraries existed. Going with what you know made sense at the time.
 
 ### 3. The Split Accidentally Became a Feature
 

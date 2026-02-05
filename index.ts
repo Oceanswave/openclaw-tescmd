@@ -73,7 +73,8 @@ export default {
 
 		// Register gateway method for tescmd.trigger.fired events pushed from tescmd node (v0.6.0+)
 		// The node sends: { method: "tescmd.trigger.fired", params: { trigger_id, field, operator, value, vin, ... } }
-		api.registerGatewayMethod("tescmd.trigger.fired", ({ params, respond }: { params: Record<string, unknown>; respond: (ok: boolean, payload?: unknown, error?: unknown) => void }) => {
+		api.registerGatewayMethod("tescmd.trigger.fired", (opts) => {
+			const { params, respond } = opts;
 			const { trigger_id, field, operator, value, vin, threshold } = params as { trigger_id: string; field: string; operator?: string; value: unknown; vin?: string; threshold?: unknown };
 			const text = `🌡️ Tesla trigger fired: ${field} ${operator || ""} ${threshold || ""} (current: ${value})${vin ? ` [${vin.slice(-4)}]` : ""}`;
 		
@@ -90,7 +91,8 @@ export default {
 		});
 
 		// Register gateway method for generic req:agent events (lifecycle, telemetry, etc.)
-		api.registerGatewayMethod("req:agent", ({ params, respond }: { params: Record<string, unknown>; respond: (ok: boolean, payload?: unknown, error?: unknown) => void }) => {
+		api.registerGatewayMethod("req:agent", (opts) => {
+			const { params, respond } = opts;
 			const eventType = (params as { event_type?: string })?.event_type;
 			api.logger.debug(`req:agent event received: ${eventType}`);
 			respond(true, { received: true, event_type: eventType });

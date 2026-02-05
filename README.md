@@ -81,7 +81,7 @@ These aren't scripted — they're natural language requests your agent can fulfi
 
 **Superchargers:** `tescmd_superchargers_near` · `tescmd_superchargers_route` · `tescmd_superchargers_search`
 
-**Triggers:** `tescmd_create_trigger` · `tescmd_battery_trigger` · `tescmd_cabin_temp_trigger` · `tescmd_outside_temp_trigger` · `tescmd_location_trigger` · `tescmd_list_triggers` · `tescmd_poll_triggers` · `tescmd_delete_trigger`
+**Triggers:** `tescmd_battery_trigger` · `tescmd_cabin_temp_trigger` · `tescmd_outside_temp_trigger` · `tescmd_location_trigger` · `tescmd_list_triggers` · `tescmd_delete_trigger` · `tescmd_get_telemetry`
 
 **Meta:** `tescmd_node_status` · `tescmd_help` · `tescmd_run_command`
 
@@ -124,7 +124,7 @@ The tescmd node streams live data — battery, location, temperature, charge sta
 
 ## Triggers: Event-Driven Automation
 
-Triggers let you set up conditions that fire automatically:
+Triggers are **push-based** — when conditions are met, the agent receives a notification automatically. No polling required.
 
 ```
 "Alert me if battery drops below 20%"

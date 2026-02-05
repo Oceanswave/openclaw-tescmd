@@ -89,7 +89,7 @@ export default {
 			try {
 				const runtime = getTescmdRuntime();
 				runtime.system.enqueueSystemEvent(text, { sessionKey: "agent:main:main" });
-				api.logger.info(`Trigger event injected: ${trigger_id} (field=${field}, value=${value})`);
+				api.logger.debug(`Trigger event injected: ${trigger_id} (field=${field}, value=${value})`);
 			} catch (e) {
 				api.logger.error(`Failed to inject trigger event: ${(e as Error).message}`);
 			}

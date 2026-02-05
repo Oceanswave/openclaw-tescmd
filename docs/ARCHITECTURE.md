@@ -6,32 +6,35 @@ Fair question. Here's the honest story.
 
 ## The Short Answer
 
-**We didn't know any better.** When tescmd was built, the OpenClaw plugin model wasn't fully mature — and by the time it was, tescmd already worked. So we kept it.
+**Live and learn.** We didn't know about the pi.dev + OpenClaw extensions model until after the Python CLI was already built. By then, it worked — so we kept it.
 
 ## The Long Answer
 
-### 1. Timing: tescmd Came First
+### 1. The Timeline
 
-tescmd started as a standalone CLI for controlling Tesla vehicles. The goal was simple: get it working, then worry about integration.
+1. **Built tescmd as a Python CLI** — standalone tool for Tesla control
+2. **Discovered OpenClaw's plugin architecture** — oh, that's... actually really nice
+3. **Realized we could have done this differently** — hindsight is 20/20
+4. **Shipped it anyway** — because it works
 
-By the time OpenClaw's plugin architecture landed — with `registerGatewayMethod()`, typed tool schemas, and proper lifecycle hooks — tescmd was already:
+By the time we understood `registerGatewayMethod()`, typed tool schemas, and the full plugin lifecycle, tescmd was already:
 - Handling real-time telemetry streams
-- Managing trigger subscriptions  
+- Managing trigger subscriptions
 - Running reliably on Raspberry Pis in garages
 
 Rewriting a working system? That's how you introduce bugs.
 
-### 2. Python Had Better Tesla Libraries
+### 2. Python Had the Libraries
 
 The Tesla ecosystem tilts toward Python and Go:
 - `tesla_fleet_api` — Python
 - `vehicle-command` — Go
 
-When tescmd was built, these were the mature options. A TypeScript implementation would have meant reimplementing a lot of protocol handling from scratch.
+When tescmd was built, these were the mature options. Going with Python made sense at the time.
 
-### 3. The Split Actually Works
+### 3. The Split Accidentally Became a Feature
 
-What started as an accident became a feature. The **node + plugin** pattern has real benefits:
+What started as "we didn't know better" turned into a decent architecture:
 
 | Concern | tescmd Node (Python) | OpenClaw Plugin (TypeScript) |
 |---------|---------------------|------------------------------|
@@ -44,7 +47,7 @@ What started as an accident became a feature. The **node + plugin** pattern has 
 
 The plugin is the **brain** (agent-facing tools, gateway methods). The node is the **muscle** (vehicle communication, streaming).
 
-### 4. Portability is Nice
+### 4. Portability is a Bonus
 
 The tescmd node runs anywhere Python runs:
 - Your laptop
@@ -52,26 +55,21 @@ The tescmd node runs anywhere Python runs:
 - A cloud VM
 - A home server
 
-It connects to OpenClaw via WebSocket and just works. No bundling heavy dependencies into the plugin.
+It connects to OpenClaw via WebSocket and just works.
 
 ### 5. Could We Port It?
 
-Sure. The Fleet API is well-documented. Someone could build a pure TypeScript implementation.
+Sure. The Fleet API is well-documented. A pure TypeScript implementation is possible.
 
-But why? The current setup:
-- **Works** — battle-tested over months
-- **Fast** — sub-second command execution
-- **Maintainable** — clear separation of concerns
-
-If it ain't broke...
+But the current setup works. It's been battle-tested. Why fix what isn't broken?
 
 ---
 
 ## TL;DR
 
-- tescmd predates the mature OpenClaw plugin model
-- Python had better Tesla libraries at the time
-- The split architecture accidentally became a feature
-- It works. Ship it.
+- We built the Python CLI before discovering OpenClaw's plugin model
+- Live and learn
+- The split architecture accidentally works well
+- It ships. That's what matters.
 
-*— Built with 20/20 hindsight, shipped with pragmatism* 🦞
+*— Built with 20/20 hindsight* 🦞

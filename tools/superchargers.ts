@@ -26,6 +26,14 @@ interface SuperchargerSite {
 	stallCount: number;
 	powerKilowatt: number;
 	dateOpened?: string;
+	stalls?: {
+		v2?: number;
+		v3?: number;
+		v4?: number;
+		urban?: number;
+		accessible?: number;
+		trailerFriendly?: number;
+	};
 }
 
 interface SuperchargerResult {
@@ -39,6 +47,7 @@ interface SuperchargerResult {
 	power_kw: number;
 	status: string;
 	distance_miles?: number;
+	trailer_friendly_stalls?: number;
 }
 
 // Haversine formula for distance calculation
@@ -100,7 +109,7 @@ async function fetchSuperchargers(): Promise<SuperchargerSite[]> {
 }
 
 function formatResult(site: SuperchargerSite, distance?: number): SuperchargerResult {
-	return {
+	const result: SuperchargerResult = {
 		name: site.name,
 		address: site.address.street,
 		city: site.address.city,
@@ -112,6 +121,10 @@ function formatResult(site: SuperchargerSite, distance?: number): SuperchargerRe
 		status: site.status,
 		distance_miles: distance ? Math.round(distance * 10) / 10 : undefined,
 	};
+	if (site.stalls?.trailerFriendly && site.stalls.trailerFriendly > 0) {
+		result.trailer_friendly_stalls = site.stalls.trailerFriendly;
+	}
+	return result;
 }
 
 export function registerSuperchargerTools(api: OpenClawPluginApi) {
@@ -353,5 +366,84 @@ export function registerSuperchargerTools(api: OpenClawPluginApi) {
 			},
 		},
 		{ name: "tescmd_superchargers_search" },
+	);
+
+	// -----------------------------------------------------------------
+	// tescmd_superchargers_trailer
+	// -----------------------------------------------------------------
+	api.registerTool(
+		{
+			name: "tescmd_superchargers_trailer",
+			label: "Find Trailer-Friendly Superchargers",
+			description:
+				"Find Tesla Superchargers with trailer-friendly (pull-through) stalls near a location. " +
+				"Essential for Cybertruck, Model X, or any Tesla towing a trailer. Returns only stations " +
+				"with dedicated trailer-friendly stalls. Data from supercharge.info (community-maintained). " +
+				"\n\nWhen to use: User is towing a trailer and needs to find charging stations that can " +
+				"accommodate their vehicle without unhitching, or asks about 'pull-through' stalls.",
+			parameters: Type.Object({
+				latitude: Type.Number({ description: "Latitude of the search center" }),
+				longitude: Type.Number({
+					description: "Longitude of the search center",
+				}),
+				radius_miles: Type.Optional(
+					Type.Number({ description: "Search radius in miles (default: 100)" }),
+				),
+				limit: Type.Optional(
+					Type.Number({
+						description: "Maximum results to return (default: 10)",
+					}),
+				),
+			}),
+			async execute(_toolCallId: string, params: Record<string, unknown>) {
+				try {
+					const lat = params.latitude as number;
+					const lon = params.longitude as number;
+					const radius = (params.radius_miles as number) || 100;
+					const limit = (params.limit as number) || 10;
+
+					const sites = await fetchSuperchargers();
+
+					const results = sites
+						.filter((site) => {
+							if (site.status !== "OPEN") return false;
+							const trailerStalls = site.stalls?.trailerFriendly ?? 0;
+							if (trailerStalls <= 0) return false;
+							const dist = haversineDistance(lat, lon, site.gps.latitude, site.gps.longitude);
+							return dist <= radius;
+						})
+						.map((site) => ({
+							site,
+							distance: haversineDistance(lat, lon, site.gps.latitude, site.gps.longitude),
+						}))
+						.sort((a, b) => a.distance - b.distance)
+						.slice(0, limit)
+						.map(({ site, distance }) => formatResult(site, distance));
+
+					return {
+						content: [
+							{
+								type: "text" as const,
+								text: JSON.stringify(
+									{
+										note: "Showing Superchargers with trailer-friendly (pull-through) stalls",
+										count: results.length,
+										superchargers: results,
+									},
+									null,
+									2,
+								),
+							},
+						],
+					};
+				} catch (err) {
+					return {
+						content: [{ type: "text" as const, text: `Error: ${(err as Error).message}` }],
+						isError: true,
+					};
+				}
+			},
+		},
+		{ name: "tescmd_superchargers_trailer" },
 	);
 }

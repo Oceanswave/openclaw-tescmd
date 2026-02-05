@@ -36,8 +36,8 @@
 
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
 import { registerSlashCommands } from "./commands/slash.js";
-import { setTescmdRuntime, getTescmdRuntime } from "./runtime.js";
 import { type TescmdConfig, tescmdConfigSchema } from "./config.js";
+import { getTescmdRuntime, setTescmdRuntime } from "./runtime.js";
 import { registerCapabilitiesTool } from "./tools/capabilities.js";
 import { registerChargeTools } from "./tools/charge.js";
 import { registerClimateTools } from "./tools/climate.js";
@@ -75,9 +75,16 @@ export default {
 		// The node sends: { method: "tescmd.trigger.fired", params: { trigger_id, field, operator, value, vin, ... } }
 		api.registerGatewayMethod("tescmd.trigger.fired", (opts) => {
 			const { params, respond } = opts;
-			const { trigger_id, field, operator, value, vin, threshold } = params as { trigger_id: string; field: string; operator?: string; value: unknown; vin?: string; threshold?: unknown };
+			const { trigger_id, field, operator, value, vin, threshold } = params as {
+				trigger_id: string;
+				field: string;
+				operator?: string;
+				value: unknown;
+				vin?: string;
+				threshold?: unknown;
+			};
 			const text = `🌡️ Tesla trigger fired: ${field} ${operator || ""} ${threshold || ""} (current: ${value})${vin ? ` [${vin.slice(-4)}]` : ""}`;
-		
+
 			// Use runtime.system.enqueueSystemEvent to inject into agent session
 			try {
 				const runtime = getTescmdRuntime();
@@ -86,7 +93,7 @@ export default {
 			} catch (e) {
 				api.logger.error(`Failed to inject trigger event: ${(e as Error).message}`);
 			}
-			
+
 			respond(true, { received: true, trigger_id });
 		});
 

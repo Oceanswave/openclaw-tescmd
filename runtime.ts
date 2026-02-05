@@ -1,6 +1,6 @@
 /**
  * Tescmd plugin runtime accessor.
- * 
+ *
  * Stores the PluginRuntime reference so it can be accessed from utility
  * modules without threading the api object through every function call.
  */
@@ -8,7 +8,10 @@
 // Use inline type to avoid version mismatch with openclaw peer dependency
 type TescmdPluginRuntime = {
 	system: {
-		enqueueSystemEvent: (text: string, options?: { sessionKey?: string; contextKey?: string }) => void;
+		enqueueSystemEvent: (
+			text: string,
+			options?: { sessionKey?: string; contextKey?: string },
+		) => void;
 		runCommandWithTimeout: (...args: unknown[]) => Promise<unknown>;
 		formatNativeDependencyHint: (...args: unknown[]) => string;
 	};

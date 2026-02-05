@@ -2,78 +2,76 @@
 
 > "Why didn't you just build this as a native OpenClaw plugin?"
 
-Fair question. Here's the story.
+Fair question. Here's the honest story.
 
 ## The Short Answer
 
-**Tesla's authentication requires a native binary that signs commands with a hardware-backed private key.** Python was the fastest path to a working prototype. By the time OpenClaw's plugin model matured, tescmd was already battle-tested — so we kept it.
+**We didn't know any better.** When tescmd was built, the OpenClaw plugin model wasn't fully mature — and by the time it was, tescmd already worked. So we kept it.
 
 ## The Long Answer
 
-### 1. Tesla's Security Model is Intense
+### 1. Timing: tescmd Came First
 
-Tesla vehicles use **end-to-end encryption** with vehicle-specific keys. Every command — unlock, climate, charge — must be signed by a private key that's paired to your specific vehicle during the initial setup dance.
+tescmd started as a standalone CLI for controlling Tesla vehicles. The goal was simple: get it working, then worry about integration.
 
-This isn't a REST API you can call with a bearer token. It's:
-- **Fleet API** for wake/state commands (OAuth2, straightforward)
-- **Vehicle Command Protocol** for actions (ECDSA signatures, protobuf, session tokens)
-
-The official Tesla libraries (`tesla-fleet-api`, `vehicle-command`) are in Go and Python. There's no official TypeScript SDK.
-
-### 2. Timing: tescmd Existed Before the Plugin Model
-
-When tescmd was first built, OpenClaw's plugin architecture was... let's say "emerging." The focus was on getting Tesla control working *at all* — not on architectural elegance.
-
-By the time `registerGatewayMethod()`, typed tool schemas, and proper plugin lifecycle hooks landed, tescmd was already:
+By the time OpenClaw's plugin architecture landed — with `registerGatewayMethod()`, typed tool schemas, and proper lifecycle hooks — tescmd was already:
 - Handling real-time telemetry streams
-- Managing trigger subscriptions
-- Running reliably on a Raspberry Pi in someone's garage
+- Managing trigger subscriptions  
+- Running reliably on Raspberry Pis in garages
 
-Rewriting it? That's a recipe for regressions.
+Rewriting a working system? That's how you introduce bugs.
 
-### 3. The Node Pattern Actually Works Well
+### 2. Python Had Better Tesla Libraries
 
-The **split architecture** has advantages:
+The Tesla ecosystem tilts toward Python and Go:
+- `tesla_fleet_api` — Python
+- `vehicle-command` — Go
+
+When tescmd was built, these were the mature options. A TypeScript implementation would have meant reimplementing a lot of protocol handling from scratch.
+
+### 3. The Split Actually Works
+
+What started as an accident became a feature. The **node + plugin** pattern has real benefits:
 
 | Concern | tescmd Node (Python) | OpenClaw Plugin (TypeScript) |
 |---------|---------------------|------------------------------|
 | Vehicle auth | ✅ Handles pairing, key storage | — |
-| Command signing | ✅ ECDSA, hardware keys | — |
+| Command execution | ✅ Fleet API, telemetry | — |
 | Telemetry streaming | ✅ Real-time WebSocket | — |
 | Agent tools | — | ✅ Rich schemas, descriptions |
 | Gateway integration | — | ✅ Push events, slash commands |
-| Composition with other tools | — | ✅ Weather, places, calendar |
+| Composition | — | ✅ Weather, places, calendar |
 
-The plugin is the **brain** (agent-facing tools, slash commands, gateway methods). The node is the **muscle** (vehicle communication, crypto, streaming).
+The plugin is the **brain** (agent-facing tools, gateway methods). The node is the **muscle** (vehicle communication, streaming).
 
-### 4. Portability
+### 4. Portability is Nice
 
-The tescmd node can run anywhere:
-- Your laptop (macOS, Linux, Windows)
+The tescmd node runs anywhere Python runs:
+- Your laptop
 - A Raspberry Pi in your garage
 - A cloud VM
 - A home server
 
-It connects to OpenClaw via WebSocket and just works. The plugin doesn't need to bundle heavy dependencies or worry about platform-specific crypto libraries.
+It connects to OpenClaw via WebSocket and just works. No bundling heavy dependencies into the plugin.
 
-### 5. Future: Could We Port It?
+### 5. Could We Port It?
 
-Theoretically, yes. The Tesla Fleet API is documented, and someone *could* reimplement the vehicle command protocol in TypeScript with WebCrypto.
+Sure. The Fleet API is well-documented. Someone could build a pure TypeScript implementation.
 
-Practically? The juice isn't worth the squeeze. The current architecture is:
-- **Stable** — tescmd has been running for months
-- **Fast** — commands execute in milliseconds
+But why? The current setup:
+- **Works** — battle-tested over months
+- **Fast** — sub-second command execution
 - **Maintainable** — clear separation of concerns
 
-If Tesla ever releases an official TypeScript SDK, we'd revisit. Until then, this works.
+If it ain't broke...
 
 ---
 
 ## TL;DR
 
-- Tesla's command signing requires crypto that's easiest in Python/Go
-- tescmd predates OpenClaw's mature plugin model
-- The split architecture (Python node + TypeScript plugin) is actually a feature
+- tescmd predates the mature OpenClaw plugin model
+- Python had better Tesla libraries at the time
+- The split architecture accidentally became a feature
 - It works. Ship it.
 
-*— Built with hindsight, shipped with pragmatism* 🦞
+*— Built with 20/20 hindsight, shipped with pragmatism* 🦞

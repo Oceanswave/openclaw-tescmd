@@ -27,9 +27,9 @@
  *   - Trunk (2):         trunk, frunk
  *   - Navigation (5):    send destination, GPS, supercharger, waypoints, homelink
  *   - Superchargers (3): find nearby, along route, search by name
- *   - Triggers (8):      list, poll, create, delete, + 4 convenience aliases
+ *   - Triggers (7):      list, delete, + 4 convenience aliases + raw telemetry
  *
- * Slash commands (15):
+ * Slash commands (14):
  *   /battery, /charge, /climate, /lock, /unlock, /sentry, /location, /vehicle,
  *   /nav, /flash, /honk, /trunk, /frunk, /homelink
  */
@@ -37,6 +37,7 @@
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
 import { registerSlashCommands } from "./commands/slash.js";
 import { type TescmdConfig, tescmdConfigSchema } from "./config.js";
+import { getTescmdRuntime, setTescmdRuntime } from "./runtime.js";
 import { registerCapabilitiesTool } from "./tools/capabilities.js";
 import { registerChargeTools } from "./tools/charge.js";
 import { registerClimateTools } from "./tools/climate.js";
@@ -62,9 +63,47 @@ export default {
 	register(api: OpenClawPluginApi) {
 		const config = tescmdConfigSchema.parse(api.pluginConfig) as TescmdConfig;
 
+		// Store runtime for use by utility modules
+		// biome-ignore lint/suspicious/noExplicitAny: runtime type varies by OpenClaw version
+		setTescmdRuntime(api.runtime as any);
+
 		if (config.debug) {
 			api.logger.info("openclaw-tescmd: debug mode enabled");
 		}
+
+		// Register gateway method for tescmd.trigger.fired events pushed from tescmd node (v0.6.0+)
+		// The node sends: { method: "tescmd.trigger.fired", params: { trigger_id, field, operator, value, vin, ... } }
+		api.registerGatewayMethod("tescmd.trigger.fired", (opts) => {
+			const { params, respond } = opts;
+			const { trigger_id, field, operator, value, vin, threshold } = params as {
+				trigger_id: string;
+				field: string;
+				operator?: string;
+				value: unknown;
+				vin?: string;
+				threshold?: unknown;
+			};
+			const text = `🌡️ Tesla trigger fired: ${field} ${operator || ""} ${threshold || ""} (current: ${value})${vin ? ` [${vin.slice(-4)}]` : ""}`;
+
+			// Use runtime.system.enqueueSystemEvent to inject into agent session
+			try {
+				const runtime = getTescmdRuntime();
+				runtime.system.enqueueSystemEvent(text, { sessionKey: "agent:main:main" });
+				api.logger.info(`Trigger event injected: ${trigger_id} (field=${field}, value=${value})`);
+			} catch (e) {
+				api.logger.error(`Failed to inject trigger event: ${(e as Error).message}`);
+			}
+
+			respond(true, { received: true, trigger_id });
+		});
+
+		// Register gateway method for generic req:agent events (lifecycle, telemetry, etc.)
+		api.registerGatewayMethod("req:agent", (opts) => {
+			const { params, respond } = opts;
+			const eventType = (params as { event_type?: string })?.event_type;
+			api.logger.debug(`req:agent event received: ${eventType}`);
+			respond(true, { received: true, event_type: eventType });
+		});
 
 		// Register all agent-callable tools by domain
 		registerCapabilitiesTool(api);

@@ -2,7 +2,7 @@
 name: tescmd
 slug: tescmd
 displayName: Tesla Vehicle Control
-version: 0.9.5
+version: 0.9.6
 description: Control and monitor Tesla vehicles via the tescmd node. Get battery, climate, location, lock/unlock doors, start/stop charging, find Superchargers, and more.
 homepage: https://github.com/oceanswave/openclaw-tescmd
 metadata: {"category":"platform","platform":"tesla","node":"tescmd"}
@@ -16,6 +16,9 @@ Control and monitor Tesla vehicles through the OpenClaw Gateway. This skill cove
 
 - tescmd node running and connected to the Gateway (preferred), OR
 - tescmd CLI installed locally (fallback mode)
+- Vehicle paired and authenticated
+
+**Version Note:** The plugin and tescmd node versions are **independent** — they do not need to match. The plugin provides agent tools that invoke commands on whatever node version is connected.
 
 Verify connection:
 ```bash
@@ -119,18 +122,34 @@ Find Tesla Superchargers anywhere, powered by [supercharge.info](https://superch
 
 ## Telemetry Triggers
 
-Set up alerts when telemetry values cross thresholds.
+Set up alerts when telemetry values cross thresholds. **Triggers are push-based** — when a trigger fires, the tescmd node automatically notifies the agent. You don't need to poll; just create the trigger and respond when notified.
+
+**Note:** Use domain-specific trigger tools for type safety and correct units. The generic trigger tool has been removed to prevent unit/format errors.
+
+### How Triggers Work
+
+1. **Create a trigger** with a condition (e.g., battery < 20%, location enters geofence)
+2. **The node monitors** telemetry in real-time
+3. **When the condition fires**, the node pushes a notification to the agent
+4. **The agent responds** by taking the requested action
+
+This enables automation like:
+- "When I arrive at the gym, post on X that I'm working out"
+- "When battery drops below 20%, text me"
+- "When cabin temp exceeds 100°F, turn on climate"
 
 ### Manage Triggers
 
 | Task | Tool |
 |------|------|
 | List active triggers | `tescmd_list_triggers` |
-| Poll for fired triggers | `tescmd_poll_triggers` |
-| Create custom trigger | `tescmd_create_trigger` |
 | Delete trigger | `tescmd_delete_trigger` |
 
-### Convenience Trigger Tools
+**Note:** Triggers are push-based. When a trigger fires, the agent receives a system event automatically — no polling required.
+
+### Trigger Tools
+
+Always use these domain-specific tools:
 
 | Tool | Field | Example Use |
 |------|-------|-------------|
@@ -151,6 +170,17 @@ Set up alerts when telemetry values cross thresholds.
 ```
 Create a trigger to alert me when battery drops below 20%
 → tescmd_battery_trigger with operator="lt", value=20
+→ When fired, the node notifies the agent automatically
+```
+
+### Example: Geofence Automation
+
+```
+"When I park at the gym, post on X that I'm working out"
+→ Use goplaces to get gym coordinates
+→ tescmd_location_trigger with operator="enter", lat=39.109, lon=-77.550, radius=100
+→ When vehicle enters the geofence, node notifies agent
+→ Agent generates image and posts to X
 ```
 
 ---
@@ -168,7 +198,32 @@ Create a trigger to alert me when battery drops below 20%
 
 1. Use `tescmd_nav_send` with the destination address
 2. Or use `tescmd_nav_gps` for exact coordinates
-3. For multi-stop, send waypoints in order using `tescmd_nav_waypoints`
+3. For multi-stop routes, see "Multi-Stop Routes with Waypoints" below
+
+### Multi-Stop Routes with Waypoints
+
+The `tescmd_nav_waypoints` tool requires Google Place IDs. **If the `goplaces` skill is installed** (requires `GOOGLE_PLACES_API_KEY`), the agent should automatically resolve addresses to Place IDs.
+
+**Agent behavior for multi-stop routes:**
+1. User requests a multi-stop route (e.g., "send my beach route to the car")
+2. Check if `goplaces` is available (look for the skill in available_skills)
+3. For each stop address, run: `goplaces resolve "<address>" --json`
+4. Extract the `place_id` from each result (it's in the JSON array: `[0].place_id`)
+5. Combine Place IDs into a comma-separated string
+6. Call `tescmd_nav_waypoints` with the combined waypoints
+
+**Example:**
+```
+User: "Load my beach route: coffee at Hornes Port Royal, Supercharger in Tappahannock, then OBX"
+
+Agent:
+1. goplaces resolve "Hornes, Port Royal, VA" --json → ChIJn7WjLIHYtokRCOgQWXQZ5l8
+2. goplaces resolve "Tesla Supercharger Tappahannock, VA" --json → ChIJwSd9CKXLsIkR4QPmAJuAO1I
+3. goplaces resolve "Outer Banks, NC" --json → ChIJcWxzpzxbpIkRszbSdWERdxs
+4. tescmd_nav_waypoints with waypoints="ChIJn7...,ChIJwS...,ChIJcW..."
+```
+
+**Note:** If `goplaces` is not configured, inform the user that multi-stop routes require the Google Places API.
 
 ### Plan a Road Trip with Charging
 

@@ -53,6 +53,8 @@ The tescmd node runs anywhere Python runs:
 
 It connects to OpenClaw via WebSocket and just works.
 
+**Bonus:** tescmd also works standalone as a CLI, or with other MCP servers — it's not locked into the OpenClaw ecosystem. Use it however you want.
+
 ### 5. Could We Port It?
 
 Sure. The Fleet API is well-documented. A pure TypeScript implementation is possible.

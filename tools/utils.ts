@@ -30,6 +30,13 @@ let cachedGatewayHost: string | null = null;
 let cachedGatewayPort: string | null = null;
 let cliAvailable: boolean | null = null;
 
+function resolveGatewayHost(bind: unknown): string {
+	if (typeof bind !== "string" || bind.trim() === "" || bind === "loopback") {
+		return "127.0.0.1";
+	}
+	return bind;
+}
+
 // CLI command mappings for fallback when node is disconnected
 const CLI_COMMAND_MAP: Record<string, string> = {
 	"door.lock": "door-lock",
@@ -95,26 +102,18 @@ const CLI_DATA_MAP: Record<
 function loadConfigValues(): void {
 	if (cachedToken !== null) return;
 
-	cachedToken = process.env.OPENCLAW_GATEWAY_TOKEN || "";
-	cachedGatewayPort = process.env.OPENCLAW_GATEWAY_PORT || "";
-	cachedGatewayHost = process.env.OPENCLAW_GATEWAY_HOST || "";
+	cachedToken = "";
+	cachedGatewayPort = "18789";
+	cachedGatewayHost = "127.0.0.1";
 
 	try {
 		const configPath = path.join(os.homedir(), ".openclaw", "openclaw.json");
 		const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-		if (!cachedToken) {
-			cachedToken = config.gateway?.auth?.token || config.gateway?.token || "";
-		}
-		if (!cachedGatewayPort) {
-			cachedGatewayPort = String(config.gateway?.port || 18789);
-		}
-		if (!cachedGatewayHost) {
-			const bind = config.gateway?.bind || "loopback";
-			cachedGatewayHost = bind === "loopback" ? "127.0.0.1" : bind;
-		}
+		cachedToken = config.gateway?.auth?.token || config.gateway?.token || "";
+		cachedGatewayPort = String(config.gateway?.port || 18789);
+		cachedGatewayHost = resolveGatewayHost(config.gateway?.bind);
 	} catch {
-		if (!cachedGatewayPort) cachedGatewayPort = "18789";
-		if (!cachedGatewayHost) cachedGatewayHost = "127.0.0.1";
+		// Use defaults when gateway config is unavailable.
 	}
 }
 

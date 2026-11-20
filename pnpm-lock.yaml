@@ -853,6 +853,9 @@ packages:
   '@smithy/smithy-client@4.11.2':
     resolution: {integrity: sha512-SCkGmFak/xC1n7hKRsUr6wOnBTJ3L22Qd4e8H1fQIuKTAjntwgU8lrdMe7uHdiT2mJAOWA/60qaW9tiMu69n1A==}
     engines: {node: '>=18.0.0'}
+    deprecated: |-
+      Deprecated due to a bug in custom logger data redaction. Upgrade to the latest version. If you used a custom logger with
+        this version, review your logs and rotate any credentials or other secrets. See https://github.com/aws/aws-sdk-js-v3/issues/8393.
 
   '@smithy/types@4.12.0':
     resolution: {integrity: sha512-9YcuJVTOBDjg9LWo23Qp0lTQ3D7fQsQtwle0jVfpbUHy9qBwCEgKuVH4FqFB3VYu0nwdHKiEMA+oXz7oV8X1kw==}
@@ -1496,8 +1499,8 @@ packages:
     resolution: {integrity: sha512-nbfWpyRMcMrPMmDwJB+dhX/eiaPKtc2RB+0QZskqJ3WjRA/FDS0e9hZrx8EC/lbEv8gXy98FcDbNa/dspAaJMg==}
     engines: {node: '>=12.0.0'}
 
-  hono@4.11.7:
-    resolution: {integrity: sha512-l7qMiNee7t82bH3SeyUCt9UF15EVmaBvsppY2zQtrbIhl/yzBTny+YUxsVjSjQ6gaqaeVtZmGocom8TzBlA4Yw==}
+  hono@4.13.18:
+    resolution: {integrity: sha512-H9q/E1XizaWstJxUW881dmLxEj+t/TrGGnyxINkm4+sK0qUwsMtFdo2BWI9Vs3cIS19MU6b6iCijoUoEf4f3DA==}
     engines: {node: '>=16.9.0'}
 
   hosted-git-info@10.1.1:
@@ -2767,83 +2770,57 @@ snapshots:
       get-east-asian-width: 1.6.0
       marked: 18.0.11
 
-  '@esbuild/aix-ppc64@0.28.2':
-    optional: true
+  '@esbuild/aix-ppc64@0.28.2': {}
 
-  '@esbuild/android-arm64@0.28.2':
-    optional: true
+  '@esbuild/android-arm64@0.28.2': {}
 
-  '@esbuild/android-arm@0.28.2':
-    optional: true
+  '@esbuild/android-arm@0.28.2': {}
 
-  '@esbuild/android-x64@0.28.2':
-    optional: true
+  '@esbuild/android-x64@0.28.2': {}
 
-  '@esbuild/darwin-arm64@0.28.2':
-    optional: true
+  '@esbuild/darwin-arm64@0.28.2': {}
 
-  '@esbuild/darwin-x64@0.28.2':
-    optional: true
+  '@esbuild/darwin-x64@0.28.2': {}
 
-  '@esbuild/freebsd-arm64@0.28.2':
-    optional: true
+  '@esbuild/freebsd-arm64@0.28.2': {}
 
-  '@esbuild/freebsd-x64@0.28.2':
-    optional: true
+  '@esbuild/freebsd-x64@0.28.2': {}
 
-  '@esbuild/linux-arm64@0.28.2':
-    optional: true
+  '@esbuild/linux-arm64@0.28.2': {}
 
-  '@esbuild/linux-arm@0.28.2':
-    optional: true
+  '@esbuild/linux-arm@0.28.2': {}
 
-  '@esbuild/linux-ia32@0.28.2':
-    optional: true
+  '@esbuild/linux-ia32@0.28.2': {}
 
-  '@esbuild/linux-loong64@0.28.2':
-    optional: true
+  '@esbuild/linux-loong64@0.28.2': {}
 
-  '@esbuild/linux-mips64el@0.28.2':
-    optional: true
+  '@esbuild/linux-mips64el@0.28.2': {}
 
-  '@esbuild/linux-ppc64@0.28.2':
-    optional: true
+  '@esbuild/linux-ppc64@0.28.2': {}
 
-  '@esbuild/linux-riscv64@0.28.2':
-    optional: true
+  '@esbuild/linux-riscv64@0.28.2': {}
 
-  '@esbuild/linux-s390x@0.28.2':
-    optional: true
+  '@esbuild/linux-s390x@0.28.2': {}
 
-  '@esbuild/linux-x64@0.28.2':
-    optional: true
+  '@esbuild/linux-x64@0.28.2': {}
 
-  '@esbuild/netbsd-arm64@0.28.2':
-    optional: true
+  '@esbuild/netbsd-arm64@0.28.2': {}
 
-  '@esbuild/netbsd-x64@0.28.2':
-    optional: true
+  '@esbuild/netbsd-x64@0.28.2': {}
 
-  '@esbuild/openbsd-arm64@0.28.2':
-    optional: true
+  '@esbuild/openbsd-arm64@0.28.2': {}
 
-  '@esbuild/openbsd-x64@0.28.2':
-    optional: true
+  '@esbuild/openbsd-x64@0.28.2': {}
 
-  '@esbuild/openharmony-arm64@0.28.2':
-    optional: true
+  '@esbuild/openharmony-arm64@0.28.2': {}
 
-  '@esbuild/sunos-x64@0.28.2':
-    optional: true
+  '@esbuild/sunos-x64@0.28.2': {}
 
-  '@esbuild/win32-arm64@0.28.2':
-    optional: true
+  '@esbuild/win32-arm64@0.28.2': {}
 
-  '@esbuild/win32-ia32@0.28.2':
-    optional: true
+  '@esbuild/win32-ia32@0.28.2': {}
 
-  '@esbuild/win32-x64@0.28.2':
-    optional: true
+  '@esbuild/win32-x64@0.28.2': {}
 
   '@google/genai@2.27.0(@modelcontextprotocol/sdk@1.32.0(supports-color@7.2.0)(zod@4.6.5))(supports-color@7.2.0)':
     dependencies:
@@ -2874,9 +2851,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@hono/node-server@1.19.9(hono@4.11.7)':
+  '@hono/node-server@1.19.9(hono@4.13.18)':
     dependencies:
-      hono: 4.11.7
+      hono: 4.13.18
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -2905,83 +2882,57 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@koromix/koffi-android-arm64@3.3.2':
-    optional: true
+  '@koromix/koffi-android-arm64@3.3.2': {}
 
-  '@koromix/koffi-android-x64@3.3.2':
-    optional: true
+  '@koromix/koffi-android-x64@3.3.2': {}
 
-  '@koromix/koffi-darwin-arm64@3.3.2':
-    optional: true
+  '@koromix/koffi-darwin-arm64@3.3.2': {}
 
-  '@koromix/koffi-darwin-x64@3.3.2':
-    optional: true
+  '@koromix/koffi-darwin-x64@3.3.2': {}
 
-  '@koromix/koffi-freebsd-arm64@3.3.2':
-    optional: true
+  '@koromix/koffi-freebsd-arm64@3.3.2': {}
 
-  '@koromix/koffi-freebsd-ia32@3.3.2':
-    optional: true
+  '@koromix/koffi-freebsd-ia32@3.3.2': {}
 
-  '@koromix/koffi-freebsd-x64@3.3.2':
-    optional: true
+  '@koromix/koffi-freebsd-x64@3.3.2': {}
 
-  '@koromix/koffi-linux-arm64@3.3.2':
-    optional: true
+  '@koromix/koffi-linux-arm64@3.3.2': {}
 
-  '@koromix/koffi-linux-arm@3.3.2':
-    optional: true
+  '@koromix/koffi-linux-arm@3.3.2': {}
 
-  '@koromix/koffi-linux-ia32@3.3.2':
-    optional: true
+  '@koromix/koffi-linux-ia32@3.3.2': {}
 
-  '@koromix/koffi-linux-loong64@3.3.2':
-    optional: true
+  '@koromix/koffi-linux-loong64@3.3.2': {}
 
-  '@koromix/koffi-linux-ppc64@3.3.2':
-    optional: true
+  '@koromix/koffi-linux-ppc64@3.3.2': {}
 
-  '@koromix/koffi-linux-riscv64@3.3.2':
-    optional: true
+  '@koromix/koffi-linux-riscv64@3.3.2': {}
 
-  '@koromix/koffi-linux-x64@3.3.2':
-    optional: true
+  '@koromix/koffi-linux-x64@3.3.2': {}
 
-  '@koromix/koffi-openbsd-arm64@3.3.2':
-    optional: true
+  '@koromix/koffi-openbsd-arm64@3.3.2': {}
 
-  '@koromix/koffi-openbsd-ia32@3.3.2':
-    optional: true
+  '@koromix/koffi-openbsd-ia32@3.3.2': {}
 
-  '@koromix/koffi-openbsd-x64@3.3.2':
-    optional: true
+  '@koromix/koffi-openbsd-x64@3.3.2': {}
 
-  '@koromix/koffi-win32-arm64@3.3.2':
-    optional: true
+  '@koromix/koffi-win32-arm64@3.3.2': {}
 
-  '@koromix/koffi-win32-ia32@3.3.2':
-    optional: true
+  '@koromix/koffi-win32-ia32@3.3.2': {}
 
-  '@koromix/koffi-win32-x64@3.3.2':
-    optional: true
+  '@koromix/koffi-win32-x64@3.3.2': {}
 
-  '@lydell/node-pty-darwin-arm64@1.2.0-beta.15':
-    optional: true
+  '@lydell/node-pty-darwin-arm64@1.2.0-beta.15': {}
 
-  '@lydell/node-pty-darwin-x64@1.2.0-beta.15':
-    optional: true
+  '@lydell/node-pty-darwin-x64@1.2.0-beta.15': {}
 
-  '@lydell/node-pty-linux-arm64@1.2.0-beta.15':
-    optional: true
+  '@lydell/node-pty-linux-arm64@1.2.0-beta.15': {}
 
-  '@lydell/node-pty-linux-x64@1.2.0-beta.15':
-    optional: true
+  '@lydell/node-pty-linux-x64@1.2.0-beta.15': {}
 
-  '@lydell/node-pty-win32-arm64@1.2.0-beta.15':
-    optional: true
+  '@lydell/node-pty-win32-arm64@1.2.0-beta.15': {}
 
-  '@lydell/node-pty-win32-x64@1.2.0-beta.15':
-    optional: true
+  '@lydell/node-pty-win32-x64@1.2.0-beta.15': {}
 
   '@lydell/node-pty@1.2.0-beta.15':
     optionalDependencies:
@@ -3004,7 +2955,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.32.0(supports-color@7.2.0)(zod@4.6.5)':
     dependencies:
-      '@hono/node-server': 1.19.9(hono@4.11.7)
+      '@hono/node-server': 1.19.9(hono@4.13.18)
       ajv: 8.17.1
       ajv-formats: 3.0.1
       content-type: 1.0.5
@@ -3014,7 +2965,7 @@ snapshots:
       eventsource-parser: 3.1.1
       express: 5.2.1(supports-color@7.2.0)
       express-rate-limit: 8.7.1(express@5.2.1(supports-color@7.2.0))(supports-color@7.2.0)
-      hono: 4.11.7
+      hono: 4.13.18
       jose: 6.2.13
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -3050,35 +3001,25 @@ snapshots:
       - ws
       - zod
 
-  '@openclaw/fs-safe-darwin-arm64@0.26.0':
-    optional: true
+  '@openclaw/fs-safe-darwin-arm64@0.26.0': {}
 
-  '@openclaw/fs-safe-darwin-x64@0.26.0':
-    optional: true
+  '@openclaw/fs-safe-darwin-x64@0.26.0': {}
 
-  '@openclaw/fs-safe-freebsd-arm64@0.26.0':
-    optional: true
+  '@openclaw/fs-safe-freebsd-arm64@0.26.0': {}
 
-  '@openclaw/fs-safe-freebsd-x64@0.26.0':
-    optional: true
+  '@openclaw/fs-safe-freebsd-x64@0.26.0': {}
 
-  '@openclaw/fs-safe-linux-arm64-gnu@0.26.0':
-    optional: true
+  '@openclaw/fs-safe-linux-arm64-gnu@0.26.0': {}
 
-  '@openclaw/fs-safe-linux-arm64-musl@0.26.0':
-    optional: true
+  '@openclaw/fs-safe-linux-arm64-musl@0.26.0': {}
 
-  '@openclaw/fs-safe-linux-x64-gnu@0.26.0':
-    optional: true
+  '@openclaw/fs-safe-linux-x64-gnu@0.26.0': {}
 
-  '@openclaw/fs-safe-linux-x64-musl@0.26.0':
-    optional: true
+  '@openclaw/fs-safe-linux-x64-musl@0.26.0': {}
 
-  '@openclaw/fs-safe-win32-arm64-msvc@0.26.0':
-    optional: true
+  '@openclaw/fs-safe-win32-arm64-msvc@0.26.0': {}
 
-  '@openclaw/fs-safe-win32-x64-msvc@0.26.0':
-    optional: true
+  '@openclaw/fs-safe-win32-x64-msvc@0.26.0': {}
 
   '@openclaw/fs-safe@0.26.0':
     optionalDependencies:
@@ -3100,8 +3041,7 @@ snapshots:
 
   '@opentelemetry/semantic-conventions@1.43.0': {}
 
-  '@pkgjs/parseargs@0.11.0':
-    optional: true
+  '@pkgjs/parseargs@0.11.0': {}
 
   '@protobufjs/aspromise@1.1.2': {}
 
@@ -3419,23 +3359,17 @@ snapshots:
 
   '@tokenizer/token@0.3.0': {}
 
-  '@trycua/cua-driver-darwin-arm64@0.32.0':
-    optional: true
+  '@trycua/cua-driver-darwin-arm64@0.32.0': {}
 
-  '@trycua/cua-driver-darwin-x64@0.32.0':
-    optional: true
+  '@trycua/cua-driver-darwin-x64@0.32.0': {}
 
-  '@trycua/cua-driver-linux-arm64-gnu@0.32.0':
-    optional: true
+  '@trycua/cua-driver-linux-arm64-gnu@0.32.0': {}
 
-  '@trycua/cua-driver-linux-x64-gnu@0.32.0':
-    optional: true
+  '@trycua/cua-driver-linux-x64-gnu@0.32.0': {}
 
-  '@trycua/cua-driver-win32-arm64-msvc@0.32.0':
-    optional: true
+  '@trycua/cua-driver-win32-arm64-msvc@0.32.0': {}
 
-  '@trycua/cua-driver-win32-x64-msvc@0.32.0':
-    optional: true
+  '@trycua/cua-driver-win32-x64-msvc@0.32.0': {}
 
   '@trycua/cua-driver@0.32.0':
     dependencies:
@@ -3459,29 +3393,21 @@ snapshots:
 
   '@ubjs/core@0.31.0-3': {}
 
-  '@ubjs/node-darwin-arm64@0.31.0-3':
-    optional: true
+  '@ubjs/node-darwin-arm64@0.31.0-3': {}
 
-  '@ubjs/node-darwin-x64@0.31.0-3':
-    optional: true
+  '@ubjs/node-darwin-x64@0.31.0-3': {}
 
-  '@ubjs/node-linux-arm64-gnu@0.31.0-3':
-    optional: true
+  '@ubjs/node-linux-arm64-gnu@0.31.0-3': {}
 
-  '@ubjs/node-linux-arm64-musl@0.31.0-3':
-    optional: true
+  '@ubjs/node-linux-arm64-musl@0.31.0-3': {}
 
-  '@ubjs/node-linux-x64-gnu@0.31.0-3':
-    optional: true
+  '@ubjs/node-linux-x64-gnu@0.31.0-3': {}
 
-  '@ubjs/node-linux-x64-musl@0.31.0-3':
-    optional: true
+  '@ubjs/node-linux-x64-musl@0.31.0-3': {}
 
-  '@ubjs/node-win32-arm64-msvc@0.31.0-3':
-    optional: true
+  '@ubjs/node-win32-arm64-msvc@0.31.0-3': {}
 
-  '@ubjs/node-win32-x64-msvc@0.31.0-3':
-    optional: true
+  '@ubjs/node-win32-x64-msvc@0.31.0-3': {}
 
   '@ubjs/node@0.31.0-3':
     optionalDependencies:
@@ -4008,7 +3934,7 @@ snapshots:
 
   highlight.js@11.12.0: {}
 
-  hono@4.11.7: {}
+  hono@4.13.18: {}
 
   hosted-git-info@10.1.1:
     dependencies:
